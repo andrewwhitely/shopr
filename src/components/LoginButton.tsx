@@ -4,8 +4,7 @@ import React, { useRef, useState } from 'react';
 import { ProfilePopover } from './ProfilePopover';
 
 export const LoginButton: React.FC = () => {
-  const { loginWithRedirect, logout, isAuthenticated, user, isLoading } =
-    useAuth0();
+  const { loginWithRedirect, isAuthenticated, user, isLoading } = useAuth0();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileButtonRef = useRef<HTMLDivElement>(null);
 
