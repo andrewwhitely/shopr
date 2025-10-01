@@ -16,7 +16,7 @@ export const useAuth0Management = () => {
   const { user, getAccessTokenSilently } = useAuth0();
 
   const API_BASE_URL =
-    import.meta.env?.VITE_API_BASE_URL ||
+    (import.meta as any).env?.VITE_API_BASE_URL ||
     'https://shopr-api.andrewnwhitely.workers.dev';
 
   const updateProfile = async (userData: UserUpdateData) => {

@@ -71,7 +71,9 @@ export const filterAndSortItems = (
 
 export const getCategories = (items: WishlistItem[]): string[] => {
   const categories = new Set(
-    items.map((item) => item.category).filter(Boolean)
+    items
+      .map((item) => item.category)
+      .filter((cat): cat is string => typeof cat === 'string' && cat.length > 0)
   );
   return Array.from(categories).sort();
 };
