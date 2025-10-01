@@ -4,6 +4,16 @@
 // Note: JWKS verification removed for Cloudflare Workers compatibility
 // In production, you should implement proper signature verification using Web Crypto API
 
+// Helper function to decode base64url (Cloudflare Workers compatible)
+function base64UrlDecode(str) {
+  // Add padding if needed
+  str += '='.repeat((4 - (str.length % 4)) % 4);
+  // Convert base64url to base64
+  str = str.replace(/-/g, '+').replace(/_/g, '/');
+  // Decode using atob (available in Cloudflare Workers)
+  return atob(str);
+}
+
 // Verify JWT token (simplified for Cloudflare Workers)
 export async function verifyToken(token, domain, audience) {
   try {
@@ -13,8 +23,8 @@ export async function verifyToken(token, domain, audience) {
       throw new Error('Invalid token format');
     }
 
-    // Decode the payload
-    const payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString());
+    // Decode the payload using Cloudflare Workers compatible method
+    const payload = JSON.parse(base64UrlDecode(parts[1]));
 
     // Check expiration
     const now = Math.floor(Date.now() / 1000);
@@ -60,7 +70,7 @@ export function getUserIdFromToken(token) {
       return null;
     }
 
-    const payload = JSON.parse(Buffer.from(parts[1], 'base64url').toString());
+    const payload = JSON.parse(base64UrlDecode(parts[1]));
 
     return payload?.sub; // Auth0 user ID is in the 'sub' claim
   } catch (error) {
@@ -77,13 +87,6 @@ export async function authenticateRequest(request, env) {
     }
 
     const token = authHeader.substring(7);
-
-    // Decode token for basic validation
-    try {
-      jwt.decode(token, { complete: true });
-    } catch (decodeError) {
-      // Token decode failed
-    }
 
     const decoded = await verifyToken(
       token,

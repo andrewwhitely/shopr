@@ -1,5 +1,5 @@
 import { useAuth0 } from '@auth0/auth0-react';
-import { LogIn, LogOut, User } from 'lucide-react';
+import { LogIn, User } from 'lucide-react';
 import React, { useRef, useState } from 'react';
 import { ProfilePopover } from './ProfilePopover';
 
@@ -24,7 +24,7 @@ export const LoginButton: React.FC = () => {
         <div className='flex items-center gap-3'>
           <div
             ref={profileButtonRef}
-            className='flex items-center gap-2 cursor-pointer hover:bg-gray-100 rounded-lg p-1 transition-colors'
+            className='flex items-center gap-2 cursor-pointer rounded-lg p-1 transition-colors'
             onClick={() => setIsProfileOpen(!isProfileOpen)}
           >
             {user.picture ? (
@@ -38,23 +38,7 @@ export const LoginButton: React.FC = () => {
                 <User className='w-4 h-4 text-gray-600' />
               </div>
             )}
-            <span className='text-sm text-gray-700 hidden sm:inline'>
-              {user.name || user.email}
-            </span>
           </div>
-          <button
-            onClick={() =>
-              logout({
-                logoutParams: {
-                  returnTo: window.location.origin,
-                },
-              })
-            }
-            className='btn btn-secondary text-sm flex items-center gap-1'
-          >
-            <LogOut className='w-4 h-4' />
-            <span className='hidden sm:inline'>Logout</span>
-          </button>
         </div>
 
         <ProfilePopover

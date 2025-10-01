@@ -153,8 +153,15 @@ export default {
       // Route handling
       if (path === '/api/wishlist' && request.method === 'GET') {
         // Get all wishlist items
-        const items = await db.getWishlistItems(auth.userId);
-        return successResponse({ items });
+        try {
+          console.log('Getting wishlist items for user:', auth.userId);
+          const items = await db.getWishlistItems(auth.userId);
+          console.log('Retrieved items count:', items.length);
+          return successResponse({ items });
+        } catch (dbError) {
+          console.error('Database error in GET wishlist:', dbError);
+          return errorResponse(`Database error: ${dbError.message}`, 500);
+        }
       }
 
       if (path === '/api/wishlist' && request.method === 'POST') {
@@ -271,11 +278,14 @@ export default {
       // Route not found
       return errorResponse('Not found', 404);
     } catch (error) {
+      console.error('API Error:', error);
+
       if (error.message === 'Authentication failed') {
         return errorResponse('Unauthorized', 401);
       }
 
-      return errorResponse('Internal server error', 500);
+      // Return more detailed error information for debugging
+      return errorResponse(`Internal server error: ${error.message}`, 500);
     }
   },
 };

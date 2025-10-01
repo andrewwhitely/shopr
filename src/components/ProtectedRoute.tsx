@@ -10,7 +10,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   children,
   fallback,
 }) => {
-  const { isAuthenticated, isLoading } = useAuth0();
+  const { isAuthenticated, isLoading, loginWithRedirect } = useAuth0();
 
   if (isLoading) {
     return (
@@ -36,7 +36,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
               your items.
             </p>
             <button
-              onClick={() => window.location.reload()}
+              onClick={() => loginWithRedirect()}
               className='btn btn-primary'
             >
               Login to Continue

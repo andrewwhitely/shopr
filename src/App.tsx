@@ -2,6 +2,7 @@ import { Plus, Search } from 'lucide-react';
 import { useState } from 'react';
 import { AddItemModal } from './components/AddItemModal';
 import { FilterBar } from './components/FilterBar';
+import { HamburgerMenu } from './components/HamburgerMenu';
 import { LoginButton } from './components/LoginButton';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { StatsCard } from './components/StatsCard';
@@ -29,6 +30,8 @@ function App() {
   const [editingItem, setEditingItem] = useState<
     (WishlistItemType & { id: string }) | null
   >(null);
+  const [showMobileStats, setShowMobileStats] = useState(false);
+  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   const handleAddItem = async (newItem: NewWishlistItem) => {
     try {
@@ -68,24 +71,56 @@ function App() {
         <div className='mobile-container sm:desktop-container'>
           <div className='flex items-center justify-between'>
             <div>
-              <h1 className='text-2xl font-bold text-gray-900'>Shopr</h1>
-              <p className='text-sm text-gray-600'>
-                Track your wishlist & purchases
-              </p>
+              <h1 className='logo-font text-5xl'>shopr</h1>
             </div>
             <div className='flex items-center gap-2'>
-              <ProtectedRoute fallback={<LoginButton />}>
+              <ProtectedRoute
+                fallback={
+                  <div className='flex items-center gap-2'>
+                    {/* Desktop Login Button for unauthenticated users */}
+                    <div className='hidden sm:block'>
+                      <LoginButton />
+                    </div>
+
+                    {/* Mobile Hamburger Menu for unauthenticated users */}
+                    <div className='sm:hidden'>
+                      <HamburgerMenu
+                        onAddItem={() => setIsAddModalOpen(true)}
+                        onShowStats={() => setShowMobileStats(!showMobileStats)}
+                        onShowFilters={() =>
+                          setShowMobileFilters(!showMobileFilters)
+                        }
+                      />
+                    </div>
+                  </div>
+                }
+              >
                 <div className='flex items-center gap-2'>
+                  {/* Desktop Add Button */}
                   <button
                     onClick={() => setIsAddModalOpen(true)}
-                    className='btn btn-primary flex items-center gap-2'
+                    className='btn btn-primary items-center gap-2 hidden sm:flex'
                     title='Add new item'
                   >
                     <Plus className='w-5 h-5' />
-                    <span className='hidden sm:inline'>Add Item</span>
-                    <span className='sm:hidden'>Add</span>
+                    <span>Add Item</span>
                   </button>
-                  <LoginButton />
+
+                  {/* Desktop Login */}
+                  <div className='hidden sm:block'>
+                    <LoginButton />
+                  </div>
+
+                  {/* Mobile Hamburger Menu for authenticated users */}
+                  <div className='sm:hidden'>
+                    <HamburgerMenu
+                      onAddItem={() => setIsAddModalOpen(true)}
+                      onShowStats={() => setShowMobileStats(!showMobileStats)}
+                      onShowFilters={() =>
+                        setShowMobileFilters(!showMobileFilters)
+                      }
+                    />
+                  </div>
                 </div>
               </ProtectedRoute>
             </div>
@@ -112,12 +147,14 @@ function App() {
 
             {/* Mobile Stats & Filters */}
             <div className='sm:hidden space-y-6'>
-              <StatsCard items={items} />
-              <FilterBar
-                filters={filters}
-                onFiltersChange={setFilters}
-                categories={categories}
-              />
+              {showMobileStats && <StatsCard items={items} />}
+              {showMobileFilters && (
+                <FilterBar
+                  filters={filters}
+                  onFiltersChange={setFilters}
+                  categories={categories}
+                />
+              )}
             </div>
 
             {/* Main Content Area */}

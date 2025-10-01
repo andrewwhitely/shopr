@@ -1,5 +1,5 @@
 import { useAuth0 } from '@auth0/auth0-react';
-import { Edit3, LogOut, Mail, Save, User, X } from 'lucide-react';
+import { Edit3, LogOut, Save, User, X } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 import { useAuth0Management } from '../utils/auth0Management';
 
@@ -164,7 +164,7 @@ export const ProfilePopover: React.FC<ProfilePopoverProps> = ({
         </div>
 
         {/* User Details */}
-        <div className='space-y-3 mb-4'>
+        {/* <div className='space-y-3 mb-4'>
           <div className='flex items-center gap-3'>
             <Mail className='w-4 h-4 text-gray-400' />
             <div className='flex-1'>
@@ -183,7 +183,7 @@ export const ProfilePopover: React.FC<ProfilePopoverProps> = ({
               )}
             </div>
           </div>
-        </div>
+        </div> */}
 
         {/* Success Message */}
         {saveSuccess && (
@@ -233,14 +233,6 @@ export const ProfilePopover: React.FC<ProfilePopoverProps> = ({
                 Edit Profile
               </button>
             )}
-          </div>
-
-          {/* Note */}
-          <div className='mt-4 p-3 bg-blue-50 rounded-lg'>
-            <p className='text-xs text-blue-700'>
-              <strong>Note:</strong> Profile updates are saved to Auth0 and will
-              persist across all sessions and devices.
-            </p>
           </div>
 
           {/* Logout Button */}

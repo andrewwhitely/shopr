@@ -11,10 +11,65 @@
     -moz-osx-font-smoothing: grayscale;
   }
 
+  /* Logo font */
+  .logo-font {
+    font-family: 'Modak', cursive;
+    font-weight: 400;
+    color: #ac590b;
+  }
+
+  /* Brand Color Palette */
+  :root {
+    /* Primary Brand Colors */
+    --brand-primary: #ac590b; /* Main brand color - warm brown */
+    --brand-primary-light: #d17a2b; /* Lighter version for hover states */
+    --brand-primary-dark: #8b4709; /* Darker version for pressed states */
+    --brand-primary-50: #fdf6f0; /* Very light tint for backgrounds */
+    --brand-primary-100: #f9e6d3; /* Light tint for subtle backgrounds */
+    --brand-primary-200: #f2cda6; /* Light tint for borders */
+    --brand-primary-300: #e8b379; /* Medium tint */
+    --brand-primary-400: #d17a2b; /* Brand primary light */
+    --brand-primary-500: #ac590b; /* Main brand color */
+    --brand-primary-600: #8b4709; /* Brand primary dark */
+    --brand-primary-700: #6b3607; /* Darker shade */
+    --brand-primary-800: #4d2705; /* Very dark shade */
+    --brand-primary-900: #2f1803; /* Darkest shade */
+
+    /* Complementary Colors */
+    --brand-secondary: #0b7cac; /* Complementary blue */
+    --brand-secondary-light: #2b9dd1; /* Light blue */
+    --brand-secondary-dark: #09588b; /* Dark blue */
+    --brand-accent: #ac7c0b; /* Warm golden accent */
+    --brand-accent-light: #d19d2b; /* Light golden */
+    --brand-accent-dark: #8b6309; /* Dark golden */
+
+    /* Neutral Colors */
+    --brand-neutral-50: #fafafa;
+    --brand-neutral-100: #f5f5f5;
+    --brand-neutral-200: #e5e5e5;
+    --brand-neutral-300: #d4d4d4;
+    --brand-neutral-400: #a3a3a3;
+    --brand-neutral-500: #737373;
+    --brand-neutral-600: #525252;
+    --brand-neutral-700: #404040;
+    --brand-neutral-800: #262626;
+    --brand-neutral-900: #171717;
+
+    /* Status Colors */
+    --brand-success: #16a34a; /* Green for success states */
+    --brand-success-light: #22c55e;
+    --brand-warning: #eab308; /* Yellow for warnings */
+    --brand-warning-light: #facc15;
+    --brand-error: #dc2626; /* Red for errors */
+    --brand-error-light: #ef4444;
+    --brand-info: #0b7cac; /* Blue for info (matches secondary) */
+    --brand-info-light: #2b9dd1;
+  }
+
   body {
     margin: 0;
     padding: 0;
-    background-color: #f8fafc;
+    background-color: var(--brand-primary-50);
     min-height: 100vh;
   }
 
@@ -29,23 +84,93 @@
   }
 
   .btn-primary {
-    @apply bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500;
+    background-color: var(--brand-primary);
+    color: white;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .btn-primary:hover {
+    background-color: var(--brand-primary-light);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(172, 89, 11, 0.3);
+  }
+
+  .btn-primary:focus {
+    outline: none;
+    ring: 2px;
+    ring-color: var(--brand-primary);
+    ring-offset: 2px;
+  }
+
+  .btn-primary:active {
+    background-color: var(--brand-primary-dark);
+    transform: translateY(0);
   }
 
   .btn-secondary {
-    @apply bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-gray-500;
+    background-color: var(--brand-neutral-200);
+    color: var(--brand-neutral-900);
+    transition: all 0.2s ease-in-out;
+  }
+
+  .btn-secondary:hover {
+    background-color: var(--brand-neutral-300);
+    transform: translateY(-1px);
+  }
+
+  .btn-secondary:focus {
+    outline: none;
+    ring: 2px;
+    ring-color: var(--brand-neutral-500);
+    ring-offset: 2px;
   }
 
   .btn-danger {
-    @apply bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
+    background-color: var(--brand-error);
+    color: white;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .btn-danger:hover {
+    background-color: var(--brand-error-light);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+  }
+
+  .btn-danger:focus {
+    outline: none;
+    ring: 2px;
+    ring-color: var(--brand-error);
+    ring-offset: 2px;
   }
 
   .input {
-    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+    @apply w-full px-3 py-2 rounded-lg focus:outline-none;
+    border: 1px solid var(--brand-neutral-300);
+    transition: all 0.2s ease-in-out;
+  }
+
+  .input:focus {
+    border-color: var(--brand-primary);
+    ring: 2px;
+    ring-color: var(--brand-primary);
+    ring-offset: 2px;
+  }
+
+  .input:hover {
+    border-color: var(--brand-primary-200);
   }
 
   .card {
-    @apply bg-white rounded-lg shadow-sm border border-gray-200 p-4;
+    @apply rounded-lg shadow-sm p-4;
+    background-color: white;
+    border: 1px solid var(--brand-neutral-200);
+    transition: all 0.2s ease-in-out;
+  }
+
+  .card:hover {
+    box-shadow: 0 4px 12px rgba(172, 89, 11, 0.1);
+    transform: translateY(-1px);
   }
 
   .mobile-container {
@@ -86,5 +211,169 @@
 
   .input:focus-visible {
     @apply ring-2 ring-primary-500 ring-offset-2 outline-none;
+  }
+
+  /* Mobile navigation improvements */
+  .mobile-nav-slide {
+    transform: translateX(100%);
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    will-change: transform;
+  }
+
+  .mobile-nav-slide.open {
+    transform: translateX(0);
+  }
+
+  /* Smooth backdrop fade */
+  .mobile-nav-backdrop {
+    opacity: 0;
+    transition: opacity 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+      backdrop-filter 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    will-change: opacity, backdrop-filter;
+    backdrop-filter: blur(0px);
+  }
+
+  .mobile-nav-backdrop.open {
+    opacity: 1;
+    backdrop-filter: blur(2px);
+  }
+
+  /* Hamburger menu button animation */
+  .hamburger-button {
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    will-change: transform, background-color;
+  }
+
+  .hamburger-button:hover {
+    transform: scale(1.05);
+  }
+
+  .hamburger-button:active {
+    transform: scale(0.95);
+  }
+
+  /* Mobile menu item hover effects */
+  .mobile-menu-item {
+    transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    will-change: transform, background-color;
+  }
+
+  .mobile-menu-item:hover {
+    transform: translateX(6px);
+  }
+
+  /* Icon rotation animation */
+  .hamburger-icon {
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    will-change: transform;
+  }
+
+  /* Smooth menu panel entrance */
+  .mobile-menu-panel {
+    transform: translateX(100%);
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    will-change: transform;
+  }
+
+  .mobile-menu-panel.open {
+    transform: translateX(0);
+  }
+
+  /* Menu item stagger animation */
+  .mobile-menu-item {
+    opacity: 0;
+    transform: translateX(20px);
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transition-delay: 0.1s;
+  }
+
+  .mobile-menu-panel.open .mobile-menu-item {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .mobile-menu-panel.open .mobile-menu-item:nth-child(1) {
+    transition-delay: 0.1s;
+  }
+
+  .mobile-menu-panel.open .mobile-menu-item:nth-child(2) {
+    transition-delay: 0.15s;
+  }
+
+  .mobile-menu-panel.open .mobile-menu-item:nth-child(3) {
+    transition-delay: 0.2s;
+  }
+
+  .mobile-menu-panel.open .mobile-menu-item:nth-child(4) {
+    transition-delay: 0.25s;
+  }
+
+  .mobile-menu-panel.open .mobile-menu-item:nth-child(5) {
+    transition-delay: 0.3s;
+  }
+
+  /* Brand-specific utility classes */
+  .text-brand-primary {
+    color: var(--brand-primary);
+  }
+
+  .text-brand-secondary {
+    color: var(--brand-secondary);
+  }
+
+  .text-brand-accent {
+    color: var(--brand-accent);
+  }
+
+  .bg-brand-primary {
+    background-color: var(--brand-primary);
+  }
+
+  .bg-brand-secondary {
+    background-color: var(--brand-secondary);
+  }
+
+  .bg-brand-accent {
+    background-color: var(--brand-accent);
+  }
+
+  .bg-brand-light {
+    background-color: var(--brand-primary-50);
+  }
+
+  .border-brand-primary {
+    border-color: var(--brand-primary);
+  }
+
+  .border-brand-secondary {
+    border-color: var(--brand-secondary);
+  }
+
+  /* Brand gradients */
+  .bg-gradient-brand {
+    background: linear-gradient(
+      135deg,
+      var(--brand-primary),
+      var(--brand-secondary)
+    );
+  }
+
+  .bg-gradient-warm {
+    background: linear-gradient(
+      135deg,
+      var(--brand-primary),
+      var(--brand-accent)
+    );
+  }
+
+  .text-gradient-brand {
+    background: linear-gradient(
+      135deg,
+      var(--brand-primary),
+      var(--brand-secondary)
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 }
