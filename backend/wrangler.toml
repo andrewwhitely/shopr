@@ -1,0 +1,34 @@
+name = "shopr-api"
+main = "src/index.js"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+# D1 Database binding
+[[d1_databases]]
+binding = "DB"
+database_name = "shopr-db"
+database_id = "2517422e-ee3f-41ef-923c-9cad7987a611"
+
+# Environment variables - Set these as secrets in production
+# wrangler secret put AUTH0_DOMAIN
+# wrangler secret put AUTH0_AUDIENCE  
+# wrangler secret put AUTH0_CLIENT_ID
+# wrangler secret put AUTH0_CLIENT_SECRET
+
+[vars]
+AUTH0_DOMAIN = "your-domain.auth0.com"
+AUTH0_AUDIENCE = "https://api.shopr.app"
+AUTH0_CLIENT_ID = "your-client-id"
+AUTH0_CLIENT_SECRET = "your-client-secret"
+
+[env.production.vars]
+AUTH0_DOMAIN = "your-domain.auth0.com"
+AUTH0_AUDIENCE = "https://api.shopr.app"
+AUTH0_CLIENT_ID = "your-client-id"
+AUTH0_CLIENT_SECRET = "your-client-secret"
+
+[env.development.vars]
+AUTH0_DOMAIN = "your-domain.auth0.com"
+AUTH0_AUDIENCE = "https://api.shopr.app"
+AUTH0_CLIENT_ID = "your-client-id"
+AUTH0_CLIENT_SECRET = "your-client-secret"
