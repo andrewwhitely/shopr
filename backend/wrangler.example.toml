@@ -1,0 +1,45 @@
+name = "shopr-api"
+main = "src/index.js"
+compatibility_date = "2024-09-23"
+compatibility_flags = ["nodejs_compat"]
+
+# D1 Database binding (example)
+[[d1_databases]]
+binding = "DB"
+database_name = "shopr-db"
+# Replace with your real D1 database ID in your local wrangler.toml
+# database_id = "REPLACE_ME_DB_ID"
+
+# Environment variables
+# For LOCAL ONLY you can place placeholder values here.
+# In production, set encrypted secrets instead of plain vars:
+#   wrangler secret put AUTH0_DOMAIN --env production
+#   wrangler secret put AUTH0_AUDIENCE --env production
+#   wrangler secret put AUTH0_CLIENT_ID --env production
+#   wrangler secret put AUTH0_CLIENT_SECRET --env production
+
+[vars]
+# Your Auth0 tenant domain (e.g. your-tenant.us.auth0.com)
+AUTH0_DOMAIN = "your-domain.auth0.com"
+# Your API identifier (used for verifying app tokens)
+AUTH0_AUDIENCE = "https://api.shopr.app"
+# For local/dev only. In production set as secrets.
+AUTH0_CLIENT_ID = "your-client-id"
+AUTH0_CLIENT_SECRET = "your-client-secret"
+
+[env.production]
+# Production-specific overrides can go here. Prefer secrets over plain vars.
+[env.production.vars]
+# Keep placeholders; set real values via `wrangler secret`.
+AUTH0_DOMAIN = "your-domain.auth0.com"
+AUTH0_AUDIENCE = "https://api.shopr.app"
+AUTH0_CLIENT_ID = "your-client-id"
+AUTH0_CLIENT_SECRET = "your-client-secret"
+
+[env.development]
+# Development overrides
+[env.development.vars]
+AUTH0_DOMAIN = "your-domain.auth0.com"
+AUTH0_AUDIENCE = "https://api.shopr.app"
+AUTH0_CLIENT_ID = "your-client-id"
+AUTH0_CLIENT_SECRET = "your-client-secret"

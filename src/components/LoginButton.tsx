@@ -1,10 +1,12 @@
 import { useAuth0 } from '@auth0/auth0-react';
 import { LogIn, User } from 'lucide-react';
 import React, { useRef, useState } from 'react';
+import { useUserState } from '../hooks/useUserState';
 import { ProfilePopover } from './ProfilePopover';
 
 export const LoginButton: React.FC = () => {
-  const { loginWithRedirect, isAuthenticated, user, isLoading } = useAuth0();
+  const { loginWithRedirect, isAuthenticated, isLoading } = useAuth0();
+  const { user } = useUserState();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const profileButtonRef = useRef<HTMLDivElement>(null);
 

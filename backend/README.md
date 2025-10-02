@@ -42,6 +42,24 @@ Update `wrangler.toml` with your Auth0 settings:
 npm run deploy
 ```
 
+## Local Wrangler Config
+
+- Copy the example file and adjust values locally:
+
+```bash
+cp wrangler.example.toml wrangler.toml
+```
+
+- Do not commit `wrangler.toml` (it is ignored by `backend/.gitignore`).
+- For production, set secrets instead of plain values, for example:
+
+```bash
+npx wrangler secret put AUTH0_DOMAIN --env production
+npx wrangler secret put AUTH0_AUDIENCE --env production
+npx wrangler secret put AUTH0_CLIENT_ID --env production
+npx wrangler secret put AUTH0_CLIENT_SECRET --env production
+```
+
 ## API Endpoints
 
 ### Authentication

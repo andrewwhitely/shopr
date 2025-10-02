@@ -71,7 +71,9 @@ function App() {
         <div className='mobile-container sm:desktop-container'>
           <div className='flex items-center justify-between'>
             <div>
-              <h1 className='logo-font text-5xl'>shopr</h1>
+              <h1 className='logo-font text-5xl'>
+                <a href='/'>shopr</a>
+              </h1>
             </div>
             <div className='flex items-center gap-2'>
               <ProtectedRoute

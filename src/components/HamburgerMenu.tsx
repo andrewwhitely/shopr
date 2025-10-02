@@ -10,6 +10,7 @@ import {
   X,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { useUserState } from '../hooks/useUserState';
 
 interface HamburgerMenuProps {
   onAddItem: () => void;
@@ -23,7 +24,8 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
   onShowFilters,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const { isAuthenticated, user, logout, loginWithRedirect } = useAuth0();
+  const { isAuthenticated, logout, loginWithRedirect } = useAuth0();
+  const { user } = useUserState();
   const menuRef = useRef<HTMLDivElement>(null);
 
   // Close menu when clicking outside

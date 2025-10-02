@@ -1,6 +1,7 @@
 import { useAuth0 } from '@auth0/auth0-react';
 import { Edit3, LogOut, Save, User, X } from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
+import { useUserState } from '../hooks/useUserState';
 import { useAuth0Management } from '../utils/auth0Management';
 
 interface ProfilePopoverProps {
@@ -28,6 +29,16 @@ export const ProfilePopover: React.FC<ProfilePopoverProps> = ({
   const popoverRef = useRef<HTMLDivElement>(null);
   const { updateProfile } = useAuth0Management();
   const { logout } = useAuth0();
+  const { updateUser, refreshUser } = useUserState();
+
+  // Update edited user when prop changes
+  useEffect(() => {
+    setEditedUser({
+      name: user?.name || '',
+      email: user?.email || '',
+      nickname: user?.nickname || '',
+    });
+  }, [user]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -62,6 +73,16 @@ export const ProfilePopover: React.FC<ProfilePopoverProps> = ({
         nickname: editedUser.nickname,
         email: editedUser.email,
       });
+
+      // Update the global user state with the new profile data
+      updateUser({
+        name: editedUser.name,
+        nickname: editedUser.nickname,
+        email: editedUser.email,
+      });
+
+      // Also try to refresh from Auth0
+      await refreshUser();
 
       setIsEditing(false);
       setSaveSuccess(true);
@@ -189,8 +210,7 @@ export const ProfilePopover: React.FC<ProfilePopoverProps> = ({
         {saveSuccess && (
           <div className='mb-4 p-3 bg-green-50 border border-green-200 rounded-lg'>
             <p className='text-sm text-green-700'>
-              ✅ Profile updated successfully! Changes will be visible after
-              refresh.
+              ✅ Profile updated successfully! Changes are now visible.
             </p>
           </div>
         )}
