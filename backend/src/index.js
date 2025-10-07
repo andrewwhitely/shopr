@@ -3,7 +3,10 @@ import { WishlistDB } from './database.js';
 
 // Auth0 Management API functions
 async function getManagementToken(env) {
-  const response = await fetch(`https://${env.AUTH0_DOMAIN}/oauth/token`, {
+  // Management API MUST use tenant domain, not custom domain
+  const tenantDomain = env.AUTH0_TENANT_DOMAIN || env.AUTH0_DOMAIN;
+
+  const response = await fetch(`https://${tenantDomain}/oauth/token`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -11,7 +14,7 @@ async function getManagementToken(env) {
     body: JSON.stringify({
       client_id: env.AUTH0_CLIENT_ID,
       client_secret: env.AUTH0_CLIENT_SECRET,
-      audience: `https://${env.AUTH0_DOMAIN}/api/v2/`,
+      audience: `https://${tenantDomain}/api/v2/`,
       grant_type: 'client_credentials',
     }),
   });
@@ -29,9 +32,11 @@ async function getManagementToken(env) {
 
 async function updateUserProfile(userId, updates, env) {
   const token = await getManagementToken(env);
+  // Management API MUST use tenant domain, not custom domain
+  const tenantDomain = env.AUTH0_TENANT_DOMAIN || env.AUTH0_DOMAIN;
 
   const response = await fetch(
-    `https://${env.AUTH0_DOMAIN}/api/v2/users/${userId}`,
+    `https://${tenantDomain}/api/v2/users/${userId}`,
     {
       method: 'PATCH',
       headers: {
@@ -55,9 +60,11 @@ async function updateUserProfile(userId, updates, env) {
 
 async function getUserProfile(userId, env) {
   const token = await getManagementToken(env);
+  // Management API MUST use tenant domain, not custom domain
+  const tenantDomain = env.AUTH0_TENANT_DOMAIN || env.AUTH0_DOMAIN;
 
   const response = await fetch(
-    `https://${env.AUTH0_DOMAIN}/api/v2/users/${userId}`,
+    `https://${tenantDomain}/api/v2/users/${userId}`,
     {
       method: 'GET',
       headers: {
