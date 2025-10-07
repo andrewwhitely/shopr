@@ -1,28 +1,11 @@
 import { useAuth0 } from '@auth0/auth0-react';
-import {
-  BarChart3,
-  Filter,
-  LogIn,
-  LogOut,
-  Menu,
-  Plus,
-  User,
-  X,
-} from 'lucide-react';
+import { LogIn, LogOut, Menu, User, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useUserState } from '../hooks/useUserState';
 
-interface HamburgerMenuProps {
-  onAddItem: () => void;
-  onShowStats?: () => void;
-  onShowFilters?: () => void;
-}
+interface HamburgerMenuProps {}
 
-export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
-  onAddItem,
-  onShowStats,
-  onShowFilters,
-}) => {
+export const HamburgerMenu: React.FC<HamburgerMenuProps> = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { isAuthenticated, logout, loginWithRedirect } = useAuth0();
   const { user } = useUserState();
@@ -62,11 +45,6 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
         returnTo: window.location.origin,
       },
     });
-    setIsOpen(false);
-  };
-
-  const handleMenuAction = (action: () => void) => {
-    action();
     setIsOpen(false);
   };
 
@@ -150,70 +128,23 @@ export const HamburgerMenu: React.FC<HamburgerMenuProps> = ({
           {/* Menu Items */}
           <nav className='flex flex-col p-4 space-y-2'>
             {isAuthenticated ? (
-              <>
-                <button
-                  onClick={() => handleMenuAction(onAddItem)}
-                  className='mobile-menu-item flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 text-left w-full'
-                >
-                  <Plus className='w-5 h-5 text-brand-primary' />
-                  <span className='font-medium text-brand-primary'>
-                    Add New Item
-                  </span>
-                </button>
-
-                {onShowStats && (
-                  <button
-                    onClick={() => handleMenuAction(onShowStats)}
-                    className='mobile-menu-item flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 text-left w-full'
-                  >
-                    <BarChart3 className='w-5 h-5 text-brand-secondary' />
-                    <span className='font-medium text-gray-900'>
-                      View Statistics
-                    </span>
-                  </button>
-                )}
-
-                {onShowFilters && (
-                  <button
-                    onClick={() => handleMenuAction(onShowFilters)}
-                    className='mobile-menu-item flex items-center gap-3 p-3 rounded-lg hover:bg-gray-100 text-left w-full'
-                  >
-                    <Filter className='w-5 h-5 text-brand-success' />
-                    <span className='font-medium text-gray-900'>
-                      Filter Items
-                    </span>
-                  </button>
-                )}
-
-                <hr className='my-4 border-gray-200' />
-
-                <button
-                  onClick={handleLogout}
-                  className='mobile-menu-item flex items-center gap-3 p-3 rounded-lg hover:bg-brand-error-50 text-left w-full'
-                >
-                  <LogOut className='w-5 h-5 text-brand-error' />
-                  <span className='font-medium text-red-600'>Logout</span>
-                </button>
-              </>
+              <button
+                onClick={handleLogout}
+                className='mobile-menu-item flex items-center gap-3 p-3 rounded-lg hover:bg-red-50 text-left w-full'
+              >
+                <LogOut className='w-5 h-5 text-red-600' />
+                <span className='font-medium text-red-600'>Logout</span>
+              </button>
             ) : (
-              <>
-                <button
-                  onClick={handleLogin}
-                  className='mobile-menu-item flex items-center gap-3 p-3 rounded-lg hover:bg-brand-primary-50 text-left w-full'
-                >
-                  <LogIn className='w-5 h-5 text-brand-primary' />
-                  <span className='font-medium text-brand-primary'>
-                    Login / Sign Up
-                  </span>
-                </button>
-
-                <div className='mt-4 p-3 bg-gray-50 rounded-lg'>
-                  <p className='text-sm text-gray-600'>
-                    Create an account to start tracking your wishlist and
-                    purchases.
-                  </p>
-                </div>
-              </>
+              <button
+                onClick={handleLogin}
+                className='mobile-menu-item flex items-center gap-3 p-3 rounded-lg hover:bg-blue-50 text-left w-full'
+              >
+                <LogIn className='w-5 h-5 text-blue-600' />
+                <span className='font-medium text-blue-600'>
+                  Login / Sign Up
+                </span>
+              </button>
             )}
           </nav>
         </div>

@@ -1,6 +1,7 @@
 import { Plus, Search } from 'lucide-react';
 import { useState } from 'react';
 import { AddItemModal } from './components/AddItemModal';
+import { CollapsibleFilterBar } from './components/CollapsibleFilterBar';
 import { FilterBar } from './components/FilterBar';
 import { HamburgerMenu } from './components/HamburgerMenu';
 import { LoginButton } from './components/LoginButton';
@@ -30,8 +31,6 @@ function App() {
   const [editingItem, setEditingItem] = useState<
     (WishlistItemType & { id: string }) | null
   >(null);
-  const [showMobileStats, setShowMobileStats] = useState(false);
-  const [showMobileFilters, setShowMobileFilters] = useState(false);
 
   const handleAddItem = async (newItem: NewWishlistItem) => {
     try {
@@ -86,13 +85,7 @@ function App() {
 
                     {/* Mobile Hamburger Menu for unauthenticated users */}
                     <div className='sm:hidden'>
-                      <HamburgerMenu
-                        onAddItem={() => setIsAddModalOpen(true)}
-                        onShowStats={() => setShowMobileStats(!showMobileStats)}
-                        onShowFilters={() =>
-                          setShowMobileFilters(!showMobileFilters)
-                        }
-                      />
+                      <HamburgerMenu />
                     </div>
                   </div>
                 }
@@ -115,13 +108,7 @@ function App() {
 
                   {/* Mobile Hamburger Menu for authenticated users */}
                   <div className='sm:hidden'>
-                    <HamburgerMenu
-                      onAddItem={() => setIsAddModalOpen(true)}
-                      onShowStats={() => setShowMobileStats(!showMobileStats)}
-                      onShowFilters={() =>
-                        setShowMobileFilters(!showMobileFilters)
-                      }
-                    />
+                    <HamburgerMenu />
                   </div>
                 </div>
               </ProtectedRoute>
@@ -148,15 +135,13 @@ function App() {
             </aside>
 
             {/* Mobile Stats & Filters */}
-            <div className='sm:hidden space-y-6'>
-              {showMobileStats && <StatsCard items={items} />}
-              {showMobileFilters && (
-                <FilterBar
-                  filters={filters}
-                  onFiltersChange={setFilters}
-                  categories={categories}
-                />
-              )}
+            <div className='sm:hidden space-y-6 mb-6'>
+              <StatsCard items={items} />
+              <CollapsibleFilterBar
+                filters={filters}
+                onFiltersChange={setFilters}
+                categories={categories}
+              />
             </div>
 
             {/* Main Content Area */}
@@ -236,17 +221,29 @@ function App() {
                   )}
                 </div>
               ) : (
-                <div className='max-h-[60vh] overflow-y-auto pr-1'>
-                  {filteredItems.map((item) => (
-                    <WishlistItem
-                      key={item.id}
-                      item={item}
-                      onTogglePurchased={togglePurchased}
-                      onDelete={deleteItem}
-                      onEdit={handleEditItem}
-                      onUpdatePrice={updatePrice}
-                    />
-                  ))}
+                <div className='space-y-4'>
+                  {/* Mobile Add Item Button */}
+                  <div className='sm:hidden'>
+                    <button
+                      onClick={() => setIsAddModalOpen(true)}
+                      className='btn btn-primary w-full'
+                    >
+                      Add New Item
+                    </button>
+                  </div>
+
+                  <div className='max-h-[60vh] overflow-y-auto pr-1 space-y-4'>
+                    {filteredItems.map((item) => (
+                      <WishlistItem
+                        key={item.id}
+                        item={item}
+                        onTogglePurchased={togglePurchased}
+                        onDelete={deleteItem}
+                        onEdit={handleEditItem}
+                        onUpdatePrice={updatePrice}
+                      />
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
