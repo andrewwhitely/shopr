@@ -22,7 +22,7 @@ export const useUserState = () => {
   const refreshUser = useCallback(async () => {
     try {
       // Force refresh of token to get latest user data
-      await getAccessTokenSilently({ ignoreCache: true });
+      await getAccessTokenSilently({ cacheMode: 'off' });
       // The user object will be updated by the useEffect above
     } catch (error) {
       console.error('Failed to refresh user data:', error);
