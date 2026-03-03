@@ -1,10 +1,10 @@
 import { useAuth0 } from '@auth0/auth0-react';
-import { LogIn, User } from 'lucide-react';
-import React, { useRef, useState } from 'react';
+import { User } from 'lucide-react';
+import { FC, useRef, useState } from 'react';
 import { useUserState } from '../hooks/useUserState';
 import { ProfilePopover } from './ProfilePopover';
 
-export const LoginButton: React.FC = () => {
+export const LoginButton: FC = () => {
   const { loginWithRedirect, isAuthenticated, isLoading } = useAuth0();
   const { user } = useUserState();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
@@ -12,9 +12,8 @@ export const LoginButton: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className='flex items-center gap-2'>
-        <div className='animate-spin w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full'></div>
-        <span className='text-sm text-gray-600'>Loading...</span>
+      <div className='flex items-center'>
+        <div className='spinner w-4 h-4' />
       </div>
     );
   }
@@ -22,24 +21,22 @@ export const LoginButton: React.FC = () => {
   if (isAuthenticated && user) {
     return (
       <div className='relative'>
-        <div className='flex items-center gap-3'>
-          <div
-            ref={profileButtonRef}
-            className='flex items-center gap-2 cursor-pointer rounded-lg p-1 transition-colors'
-            onClick={() => setIsProfileOpen(!isProfileOpen)}
-          >
-            {user.picture ? (
-              <img
-                src={user.picture}
-                alt={user.name}
-                className='w-8 h-8 rounded-full'
-              />
-            ) : (
-              <div className='w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center'>
-                <User className='w-4 h-4 text-gray-600' />
-              </div>
-            )}
-          </div>
+        <div
+          ref={profileButtonRef}
+          className='flex items-center gap-2 cursor-pointer rounded-full p-1 transition-colors hover:bg-warm-stone-100'
+          onClick={() => setIsProfileOpen(!isProfileOpen)}
+        >
+          {user.picture ? (
+            <img
+              src={user.picture}
+              alt={user.name}
+              className='w-8 h-8 rounded-full ring-2 ring-white ring-offset-1'
+            />
+          ) : (
+            <div className='w-8 h-8 bg-brand-100 rounded-full flex items-center justify-center'>
+              <User className='w-4 h-4 text-brand-600' />
+            </div>
+          )}
         </div>
 
         <ProfilePopover
@@ -56,10 +53,9 @@ export const LoginButton: React.FC = () => {
     <div className='flex items-center gap-2'>
       <button
         onClick={() => loginWithRedirect()}
-        className='btn btn-primary flex items-center gap-2'
+        className='btn btn-secondary text-sm px-3 py-1.5'
       >
-        <LogIn className='w-4 h-4' />
-        <span className='hidden sm:inline'>Login</span>
+        Login
       </button>
       <button
         onClick={() =>
@@ -69,10 +65,9 @@ export const LoginButton: React.FC = () => {
             },
           })
         }
-        className='btn btn-secondary flex items-center gap-2'
+        className='btn btn-primary text-sm px-3 py-1.5'
       >
-        <span className='hidden sm:inline'>Sign Up</span>
-        <span className='sm:hidden'>Sign Up</span>
+        Sign Up
       </button>
     </div>
   );

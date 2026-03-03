@@ -11,10 +11,6 @@
     "db:migrate": "wrangler d1 migrations apply shopr-db",
     "db:migrate:local": "wrangler d1 migrations apply shopr-db --local"
   },
-  "dependencies": {
-    "jsonwebtoken": "^9.0.2",
-    "jwks-client": "^2.1.0"
-  },
   "devDependencies": {
     "wrangler": "^4.40.3"
   }

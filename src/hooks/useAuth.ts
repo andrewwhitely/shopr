@@ -1,6 +1,9 @@
 import { useAuth0 } from '@auth0/auth0-react';
 import { useCallback } from 'react';
 
+const AUDIENCE =
+  (import.meta as any).env?.VITE_AUTH0_AUDIENCE || 'https://api.shopr.app';
+
 export const useAuth = () => {
   const {
     isAuthenticated,
@@ -15,7 +18,9 @@ export const useAuth = () => {
     if (!isAuthenticated) return null;
 
     try {
-      const token = await getAccessTokenSilently();
+      const token = await getAccessTokenSilently({
+        authorizationParams: { audience: AUDIENCE },
+      });
       return token;
     } catch (error) {
       console.error('Error getting access token:', error);

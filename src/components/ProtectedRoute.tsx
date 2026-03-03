@@ -1,12 +1,12 @@
 import { useAuth0 } from '@auth0/auth0-react';
-import React from 'react';
+import React, { FC } from 'react';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
   fallback?: React.ReactNode;
 }
 
-export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+export const ProtectedRoute: FC<ProtectedRouteProps> = ({
   children,
   fallback,
 }) => {
@@ -14,10 +14,10 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   if (isLoading) {
     return (
-      <div className='min-h-screen bg-gray-50 flex items-center justify-center'>
+      <div className='flex items-center justify-center py-32'>
         <div className='text-center'>
-          <div className='animate-spin w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4'></div>
-          <p className='text-gray-600'>Loading...</p>
+          <div className='spinner w-8 h-8 mx-auto mb-4' />
+          <p className='text-sm font-body text-warm-stone-500'>Loading…</p>
         </div>
       </div>
     );
@@ -26,14 +26,14 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   if (!isAuthenticated) {
     return (
       fallback || (
-        <div className='min-h-screen bg-gray-50 flex items-center justify-center'>
-          <div className='text-center max-w-md mx-auto p-6'>
-            <h1 className='text-3xl font-bold text-gray-900 mb-4'>
+        <div className='flex items-center justify-center py-32'>
+          <div className='text-center max-w-sm mx-auto px-6'>
+            <h1 className='font-display text-4xl font-light text-espresso mb-3'>
               Welcome to Shopr
             </h1>
-            <p className='text-gray-600 mb-6'>
-              Please log in to access your personal wishlist and start tracking
-              your items.
+            <p className='text-sm font-body text-warm-stone-500 mb-8 leading-relaxed'>
+              Log in to access your personal wishlist and start tracking the
+              things you want.
             </p>
             <button
               onClick={() => loginWithRedirect()}

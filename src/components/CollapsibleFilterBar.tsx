@@ -1,5 +1,5 @@
-import { ChevronDown, ChevronUp, Filter } from 'lucide-react';
-import React, { useState } from 'react';
+import { ChevronDown, ChevronUp, SlidersHorizontal } from 'lucide-react';
+import { FC, useState } from 'react';
 import { WishlistFilters } from '../types';
 import { FilterBar } from './FilterBar';
 
@@ -9,7 +9,7 @@ interface CollapsibleFilterBarProps {
   categories: string[];
 }
 
-export const CollapsibleFilterBar: React.FC<CollapsibleFilterBarProps> = ({
+export const CollapsibleFilterBar: FC<CollapsibleFilterBarProps> = ({
   filters,
   onFiltersChange,
   categories,
@@ -20,31 +20,35 @@ export const CollapsibleFilterBar: React.FC<CollapsibleFilterBarProps> = ({
     filters.purchased !== undefined || filters.category !== undefined;
 
   return (
-    <div className='card'>
-      {/* Filter Header */}
+    <div className='bg-white rounded-xl border border-warm-stone-200 overflow-hidden'>
+      {/* Toggle header */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className='flex items-center justify-between w-full p-2 -m-2 rounded-lg hover:bg-gray-50 transition-colors'
+        className='flex items-center justify-between w-full px-4 py-3 hover:bg-warm-stone-50 transition-colors'
       >
         <div className='flex items-center gap-2'>
-          <Filter className='w-4 h-4 text-gray-600' />
-          <span className='font-medium text-gray-900'>Filters</span>
+          <SlidersHorizontal className='w-4 h-4 text-warm-stone-500' />
+          <span className='text-sm font-body font-medium text-espresso'>
+            Filter & Sort
+          </span>
           {hasActiveFilters && (
-            <span className='bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full'>
+            <span className='bg-brand-100 text-brand-600 text-xs px-2 py-0.5 rounded-full font-body font-medium'>
               Active
             </span>
           )}
         </div>
-        {isExpanded ? (
-          <ChevronUp className='w-4 h-4 text-gray-600' />
-        ) : (
-          <ChevronDown className='w-4 h-4 text-gray-600' />
-        )}
+        <div className='text-warm-stone-400'>
+          {isExpanded ? (
+            <ChevronUp className='w-4 h-4' />
+          ) : (
+            <ChevronDown className='w-4 h-4' />
+          )}
+        </div>
       </button>
 
-      {/* Filter Content */}
+      {/* Expanded content */}
       {isExpanded && (
-        <div className='mt-4 pt-4 border-t border-gray-200'>
+        <div className='px-4 pb-4 pt-1 border-t border-warm-stone-100'>
           <FilterBar
             filters={filters}
             onFiltersChange={onFiltersChange}

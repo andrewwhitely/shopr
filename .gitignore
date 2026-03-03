@@ -101,6 +101,7 @@ jspm_packages/
 
 # Cloudflare Workers
 .wrangler/
+backend/.dev.vars
 
 # Auth0 secrets
 auth0-secrets.json

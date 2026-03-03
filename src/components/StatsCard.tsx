@@ -1,5 +1,4 @@
-import { DollarSign, ShoppingBag, Tag, TrendingUp } from 'lucide-react';
-import React from 'react';
+import { FC } from 'react';
 import { WishlistItem } from '../types';
 import {
   calculatePurchasedValue,
@@ -12,7 +11,7 @@ interface StatsCardProps {
   items: WishlistItem[];
 }
 
-export const StatsCard: React.FC<StatsCardProps> = ({ items }) => {
+export const StatsCard: FC<StatsCardProps> = ({ items }) => {
   const totalValue = calculateTotalValue(items);
   const purchasedValue = calculatePurchasedValue(items);
   const remainingValue = totalValue - purchasedValue;
@@ -22,46 +21,90 @@ export const StatsCard: React.FC<StatsCardProps> = ({ items }) => {
   const remainingCount = items.length - purchasedCount;
 
   return (
-    <div className='grid grid-cols-2 gap-3 mb-6'>
-      <div className='card text-center p-3'>
-        <div className='flex items-center justify-center mb-2'>
-          <DollarSign className='w-5 h-5 text-green-600 mr-1' />
-          <span className='text-sm font-medium text-gray-600'>Total Value</span>
+    <div>
+      {/* Mobile: 2×2 grid */}
+      <div className='grid grid-cols-2 gap-3 sm:hidden'>
+        <div className='bg-white rounded-xl border border-warm-stone-200 p-4'>
+          <div className='font-mono text-base font-medium text-espresso truncate'>
+            {formatCurrency(totalValue)}
+          </div>
+          <div className='text-xs font-body text-warm-stone-500 mt-1 uppercase tracking-wider'>
+            Total
+          </div>
         </div>
-        <div className='text-sm font-semibold text-gray-900 break-words overflow-hidden'>
-          {formatCurrency(totalValue)}
+        <div className='bg-white rounded-xl border border-warm-stone-200 p-4'>
+          <div className='font-mono text-base font-medium text-espresso truncate'>
+            {formatCurrency(remainingValue)}
+          </div>
+          <div className='text-xs font-body text-warm-stone-500 mt-1 uppercase tracking-wider'>
+            Remaining · {remainingCount}
+          </div>
+        </div>
+        <div className='bg-white rounded-xl border border-warm-stone-200 p-4'>
+          <div className='font-mono text-base font-medium text-green-700 truncate'>
+            {formatCurrency(purchasedValue)}
+          </div>
+          <div className='text-xs font-body text-warm-stone-500 mt-1 uppercase tracking-wider'>
+            Purchased · {purchasedCount}
+          </div>
+        </div>
+        <div className='bg-white rounded-xl border border-warm-stone-200 p-4'>
+          <div className='font-mono text-base font-medium text-espresso'>
+            {categories.length}
+          </div>
+          <div className='text-xs font-body text-warm-stone-500 mt-1 uppercase tracking-wider'>
+            Categories
+          </div>
         </div>
       </div>
 
-      <div className='card text-center p-3'>
-        <div className='flex items-center justify-center mb-2'>
-          <ShoppingBag className='w-5 h-5 text-blue-600 mr-1' />
-          <span className='text-sm font-medium text-gray-600'>Remaining</span>
-        </div>
-        <div className='text-sm font-semibold text-gray-900 break-words overflow-hidden'>
-          {formatCurrency(remainingValue)}
-        </div>
-        <div className='text-xs text-gray-500'>{remainingCount} items</div>
-      </div>
-
-      <div className='card text-center p-3'>
-        <div className='flex items-center justify-center mb-2'>
-          <TrendingUp className='w-5 h-5 text-purple-600 mr-1' />
-          <span className='text-sm font-medium text-gray-600'>Purchased</span>
-        </div>
-        <div className='text-sm font-semibold text-gray-900 break-words overflow-hidden'>
-          {formatCurrency(purchasedValue)}
-        </div>
-        <div className='text-xs text-gray-500'>{purchasedCount} items</div>
-      </div>
-
-      <div className='card text-center p-3'>
-        <div className='flex items-center justify-center mb-2'>
-          <Tag className='w-5 h-5 text-orange-600 mr-1' />
-          <span className='text-sm font-medium text-gray-600'>Categories</span>
-        </div>
-        <div className='text-lg font-semibold text-gray-900'>
-          {categories.length}
+      {/* Desktop: vertical list */}
+      <div className='hidden sm:block'>
+        <h3 className='text-xs font-body font-semibold text-warm-stone-400 uppercase tracking-widest mb-4'>
+          Overview
+        </h3>
+        <div className='space-y-3'>
+          <div className='flex items-baseline justify-between'>
+            <span className='text-sm font-body text-warm-stone-600'>Total</span>
+            <span className='font-mono text-sm font-medium text-espresso'>
+              {formatCurrency(totalValue)}
+            </span>
+          </div>
+          <div className='flex items-baseline justify-between'>
+            <span className='text-sm font-body text-warm-stone-600'>
+              Remaining
+            </span>
+            <div className='text-right'>
+              <span className='font-mono text-sm font-medium text-espresso'>
+                {formatCurrency(remainingValue)}
+              </span>
+              <span className='text-xs text-warm-stone-400 ml-1'>
+                ({remainingCount})
+              </span>
+            </div>
+          </div>
+          <div className='flex items-baseline justify-between'>
+            <span className='text-sm font-body text-warm-stone-600'>
+              Purchased
+            </span>
+            <div className='text-right'>
+              <span className='font-mono text-sm font-medium text-green-700'>
+                {formatCurrency(purchasedValue)}
+              </span>
+              <span className='text-xs text-warm-stone-400 ml-1'>
+                ({purchasedCount})
+              </span>
+            </div>
+          </div>
+          <div className='h-px bg-warm-stone-100' />
+          <div className='flex items-baseline justify-between'>
+            <span className='text-sm font-body text-warm-stone-600'>
+              Categories
+            </span>
+            <span className='font-mono text-sm font-medium text-espresso'>
+              {categories.length}
+            </span>
+          </div>
         </div>
       </div>
     </div>

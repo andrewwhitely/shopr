@@ -1,5 +1,5 @@
 import { X } from 'lucide-react';
-import React, { useState } from 'react';
+import { FC, FormEvent, useEffect, useState } from 'react';
 import { NewWishlistItem } from '../types';
 import { CategoryDropdown } from './CategoryDropdown';
 
@@ -11,7 +11,7 @@ interface AddItemModalProps {
   categories: string[];
 }
 
-export const AddItemModal: React.FC<AddItemModalProps> = ({
+export const AddItemModal: FC<AddItemModalProps> = ({
   isOpen,
   onClose,
   onAdd,
@@ -30,7 +30,7 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({
 
   const [errors, setErrors] = useState<Record<string, string>>({});
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (editingItem) {
       setFormData({
         name: editingItem.name,
@@ -78,11 +78,9 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-
     if (!validateForm()) return;
-
     onAdd(formData);
     onClose();
   };
@@ -100,43 +98,60 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50'>
-      <div className='bg-white rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto'>
-        <div className='flex items-center justify-between p-4 border-b'>
-          <h2 className='text-lg font-semibold'>
-            {editingItem ? 'Edit Item' : 'Add New Item'}
+    <div className='fixed inset-0 z-50 flex items-center justify-center p-4'>
+      {/* Backdrop */}
+      <div
+        className='absolute inset-0 bg-espresso/60 backdrop-blur-sm animate-fade-in'
+        onClick={onClose}
+      />
+
+      {/* Modal */}
+      <div className='relative bg-white rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl shadow-espresso/20 animate-fade-up'>
+        {/* Header */}
+        <div className='flex items-center justify-between px-6 pt-6 pb-4 border-b border-warm-stone-100'>
+          <h2 className='font-display text-2xl font-light text-espresso'>
+            {editingItem ? 'Edit Item' : 'Add Item'}
           </h2>
-          <button onClick={onClose} className='btn btn-secondary p-2'>
-            <X className='w-5 h-5' />
+          <button
+            onClick={onClose}
+            className='p-2 rounded-lg text-warm-stone-400 hover:text-espresso hover:bg-warm-stone-100 transition-all'
+          >
+            <X className='w-4 h-4' />
           </button>
         </div>
 
-        <form onSubmit={handleSubmit} className='p-4 space-y-4'>
+        {/* Form */}
+        <form onSubmit={handleSubmit} className='px-6 py-5 space-y-5'>
+          {/* Name */}
           <div>
             <label
               htmlFor='name'
-              className='block text-sm font-medium text-gray-700 mb-1'
+              className='block text-xs font-body font-semibold text-warm-stone-500 uppercase tracking-widest mb-2'
             >
-              Item Name *
+              Name *
             </label>
             <input
               type='text'
               id='name'
               value={formData.name}
               onChange={(e) => handleInputChange('name', e.target.value)}
-              className={`input ${errors.name ? 'border-red-500' : ''}`}
-              placeholder='Enter item name'
+              className={`input ${errors.name ? 'border-red-300 focus:border-red-500' : ''}`}
+              placeholder='What are you wishing for?'
+              autoFocus
             />
             {errors.name && (
-              <p className='text-red-500 text-sm mt-1'>{errors.name}</p>
+              <p className='text-red-500 text-xs mt-1 font-body'>
+                {errors.name}
+              </p>
             )}
           </div>
 
-          <div className='grid grid-cols-2 gap-4'>
+          {/* Price + Currency */}
+          <div className='grid grid-cols-2 gap-3'>
             <div>
               <label
                 htmlFor='price'
-                className='block text-sm font-medium text-gray-700 mb-1'
+                className='block text-xs font-body font-semibold text-warm-stone-500 uppercase tracking-widest mb-2'
               >
                 Price *
               </label>
@@ -149,18 +164,20 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({
                 onChange={(e) =>
                   handleInputChange('price', parseFloat(e.target.value) || 0)
                 }
-                className={`input ${errors.price ? 'border-red-500' : ''}`}
+                className={`input font-mono ${errors.price ? 'border-red-300' : ''}`}
                 placeholder='0.00'
               />
               {errors.price && (
-                <p className='text-red-500 text-sm mt-1'>{errors.price}</p>
+                <p className='text-red-500 text-xs mt-1 font-body'>
+                  {errors.price}
+                </p>
               )}
             </div>
 
             <div>
               <label
                 htmlFor='currency'
-                className='block text-sm font-medium text-gray-700 mb-1'
+                className='block text-xs font-body font-semibold text-warm-stone-500 uppercase tracking-widest mb-2'
               >
                 Currency
               </label>
@@ -179,10 +196,11 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({
             </div>
           </div>
 
+          {/* Category */}
           <div>
             <label
               htmlFor='category'
-              className='block text-sm font-medium text-gray-700 mb-1'
+              className='block text-xs font-body font-semibold text-warm-stone-500 uppercase tracking-widest mb-2'
             >
               Category
             </label>
@@ -194,10 +212,11 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({
             />
           </div>
 
+          {/* URL */}
           <div>
             <label
               htmlFor='url'
-              className='block text-sm font-medium text-gray-700 mb-1'
+              className='block text-xs font-body font-semibold text-warm-stone-500 uppercase tracking-widest mb-2'
             >
               URL
             </label>
@@ -206,18 +225,21 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({
               id='url'
               value={formData.url || ''}
               onChange={(e) => handleInputChange('url', e.target.value)}
-              className={`input ${errors.url ? 'border-red-500' : ''}`}
-              placeholder='https://example.com/product'
+              className={`input ${errors.url ? 'border-red-300' : ''}`}
+              placeholder='https://…'
             />
             {errors.url && (
-              <p className='text-red-500 text-sm mt-1'>{errors.url}</p>
+              <p className='text-red-500 text-xs mt-1 font-body'>
+                {errors.url}
+              </p>
             )}
           </div>
 
+          {/* Notes */}
           <div>
             <label
               htmlFor='notes'
-              className='block text-sm font-medium text-gray-700 mb-1'
+              className='block text-xs font-body font-semibold text-warm-stone-500 uppercase tracking-widest mb-2'
             >
               Notes
             </label>
@@ -226,12 +248,13 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({
               value={formData.notes || ''}
               onChange={(e) => handleInputChange('notes', e.target.value)}
               className='input min-h-[80px] resize-none'
-              placeholder='Add any additional notes...'
+              placeholder='Any additional details…'
             />
           </div>
 
+          {/* Purchased toggle (edit mode only) */}
           {editingItem && (
-            <div className='flex items-center'>
+            <div className='flex items-center gap-3 p-3 rounded-xl bg-warm-stone-50 border border-warm-stone-100'>
               <input
                 type='checkbox'
                 id='purchased'
@@ -239,15 +262,19 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({
                 onChange={(e) =>
                   handleInputChange('purchased', e.target.checked)
                 }
-                className='mr-2'
+                className='w-4 h-4 accent-brand-500 rounded'
               />
-              <label htmlFor='purchased' className='text-sm text-gray-700'>
+              <label
+                htmlFor='purchased'
+                className='text-sm font-body text-warm-stone-700'
+              >
                 Mark as purchased
               </label>
             </div>
           )}
 
-          <div className='flex gap-3 pt-4'>
+          {/* Actions */}
+          <div className='flex gap-3 pt-1'>
             <button
               type='button'
               onClick={onClose}
@@ -256,7 +283,7 @@ export const AddItemModal: React.FC<AddItemModalProps> = ({
               Cancel
             </button>
             <button type='submit' className='btn btn-primary flex-1'>
-              {editingItem ? 'Update Item' : 'Add Item'}
+              {editingItem ? 'Update' : 'Add Item'}
             </button>
           </div>
         </form>

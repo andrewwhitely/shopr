@@ -1,8 +1,9 @@
 import { useAuth0 } from '@auth0/auth0-react';
-import { Edit3, LogOut, Save, User, X } from 'lucide-react';
-import React, { useEffect, useRef, useState } from 'react';
-import { useUserState } from '../hooks/useUserState';
-import { useAuth0Management } from '../utils/auth0Management';
+import { LogOut, Mail, PenSquare, Save, ShoppingBag, X } from 'lucide-react';
+import React, { FC, useEffect, useRef } from 'react';
+import { useWishlistStats } from '../contexts/WishlistContext';
+import { useProfileEdit } from '../hooks/useProfileEdit';
+import { formatCurrency } from '../utils/helpers';
 
 interface ProfilePopoverProps {
   user: any;
@@ -11,34 +12,33 @@ interface ProfilePopoverProps {
   triggerRef: React.RefObject<HTMLElement>;
 }
 
-export const ProfilePopover: React.FC<ProfilePopoverProps> = ({
+const getInitials = (name?: string) =>
+  (name ?? '')
+    .split(' ')
+    .slice(0, 2)
+    .map((w) => w[0]?.toUpperCase() ?? '')
+    .join('');
+
+export const ProfilePopover: FC<ProfilePopoverProps> = ({
   user,
   isOpen,
   onClose,
   triggerRef,
 }) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [saveError, setSaveError] = useState<string | null>(null);
-  const [saveSuccess, setSaveSuccess] = useState(false);
-  const [editedUser, setEditedUser] = useState({
-    name: user?.name || '',
-    email: user?.email || '',
-    nickname: user?.nickname || '',
-  });
   const popoverRef = useRef<HTMLDivElement>(null);
-  const { updateProfile } = useAuth0Management();
   const { logout } = useAuth0();
-  const { updateUser, refreshUser } = useUserState();
-
-  // Update edited user when prop changes
-  useEffect(() => {
-    setEditedUser({
-      name: user?.name || '',
-      email: user?.email || '',
-      nickname: user?.nickname || '',
-    });
-  }, [user]);
+  const { itemCount, totalValue } = useWishlistStats();
+  const {
+    isEditing,
+    isSaving,
+    saveError,
+    saveSuccess,
+    editedUser,
+    setEditedUser,
+    setIsEditing,
+    handleSave,
+    handleCancel,
+  } = useProfileEdit(user);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -61,96 +61,51 @@ export const ProfilePopover: React.FC<ProfilePopoverProps> = ({
     };
   }, [isOpen, onClose, triggerRef]);
 
-  const handleSave = async () => {
-    try {
-      setIsSaving(true);
-      setSaveError(null);
-      setSaveSuccess(false);
-
-      // Update profile via Auth0 Management API
-      await updateProfile({
-        name: editedUser.name,
-        nickname: editedUser.nickname,
-        email: editedUser.email,
-      });
-
-      // Update the global user state with the new profile data
-      updateUser({
-        name: editedUser.name,
-        nickname: editedUser.nickname,
-        email: editedUser.email,
-      });
-
-      // Also try to refresh from Auth0
-      await refreshUser();
-
-      setIsEditing(false);
-      setSaveSuccess(true);
-
-      // Profile updated successfully
-      setTimeout(() => {
-        setSaveSuccess(false);
-        onClose();
-      }, 2000);
-    } catch (error) {
-      setSaveError(
-        error instanceof Error ? error.message : 'Failed to update profile'
-      );
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  const handleCancel = () => {
-    setEditedUser({
-      name: user?.name || '',
-      email: user?.email || '',
-      nickname: user?.nickname || '',
-    });
-    setIsEditing(false);
-  };
-
   const handleLogout = () => {
-    logout({
-      logoutParams: {
-        returnTo: window.location.origin,
-      },
-    });
+    logout({ logoutParams: { returnTo: window.location.origin } });
   };
 
   if (!isOpen) return null;
 
+  const initials = getInitials(user?.name);
+
   return (
     <div
       ref={popoverRef}
-      className='absolute top-full right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 z-50'
+      className='absolute top-full right-0 mt-2 w-80 bg-white rounded-2xl shadow-xl shadow-espresso/10 border border-warm-stone-100 z-50 animate-fade-up overflow-hidden'
     >
-      <div className='p-4'>
-        {/* Header */}
-        <div className='flex items-center justify-between mb-4'>
-          <h3 className='text-lg font-semibold text-gray-900'>Profile</h3>
-          <button
-            onClick={onClose}
-            className='text-gray-400 hover:text-gray-600 transition-colors'
-          >
-            <X className='w-5 h-5' />
-          </button>
-        </div>
+      {/* Header bar */}
+      <div className='flex items-center justify-between px-4 pt-4 pb-3 border-b border-warm-stone-100'>
+        <h3 className='font-display text-xl font-light text-espresso tracking-wide'>
+          Profile
+        </h3>
+        <button
+          onClick={onClose}
+          className='text-warm-stone-400 hover:text-espresso transition-colors p-1 -mr-1 rounded-lg hover:bg-warm-stone-50'
+          aria-label='Close profile'
+        >
+          <X className='w-4 h-4' />
+        </button>
+      </div>
 
-        {/* Profile Picture and Basic Info */}
-        <div className='flex items-center gap-3 mb-4 pb-4 border-b border-gray-200'>
+      <div className='p-4 space-y-4'>
+        {/* Avatar + name/nickname */}
+        <div className='flex items-center gap-3'>
           {user?.picture ? (
             <img
               src={user.picture}
-              alt={user.name}
-              className='w-12 h-12 rounded-full'
+              alt={user?.name ?? 'Profile'}
+              className='w-12 h-12 rounded-full ring-2 ring-warm-stone-100 ring-offset-1 flex-shrink-0'
             />
           ) : (
-            <div className='w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center'>
-              <User className='w-6 h-6 text-gray-600' />
+            <div className='w-12 h-12 bg-brand-100 rounded-full flex items-center justify-center flex-shrink-0 ring-2 ring-warm-stone-100 ring-offset-1'>
+              <span className='font-body font-semibold text-brand-600 text-sm'>
+                {initials || '?'}
+              </span>
             </div>
           )}
-          <div className='flex-1'>
+
+          <div className='flex-1 min-w-0'>
             {isEditing ? (
               <input
                 type='text'
@@ -158,14 +113,16 @@ export const ProfilePopover: React.FC<ProfilePopoverProps> = ({
                 onChange={(e) =>
                   setEditedUser({ ...editedUser, name: e.target.value })
                 }
-                className='w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500'
+                className='input w-full text-sm mb-1'
                 placeholder='Full name'
+                autoFocus
               />
             ) : (
-              <h4 className='font-medium text-gray-900'>
+              <p className='font-display text-lg font-light text-espresso leading-tight truncate'>
                 {user?.name || 'No name'}
-              </h4>
+              </p>
             )}
+
             {isEditing ? (
               <input
                 type='text'
@@ -173,96 +130,90 @@ export const ProfilePopover: React.FC<ProfilePopoverProps> = ({
                 onChange={(e) =>
                   setEditedUser({ ...editedUser, nickname: e.target.value })
                 }
-                className='w-full px-2 py-1 text-xs text-gray-600 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500'
+                className='input w-full text-xs'
                 placeholder='Nickname'
               />
             ) : (
-              <p className='text-sm text-gray-600'>
-                @{user?.nickname || user?.email?.split('@')[0]}
+              <p className='font-mono text-xs text-warm-stone-400 truncate'>
+                @{user?.nickname || user?.email?.split('@')[0] || '—'}
               </p>
             )}
           </div>
+
+          {!isEditing && (
+            <button
+              onClick={() => setIsEditing(true)}
+              className='text-warm-stone-400 hover:text-brand-500 transition-colors p-1.5 rounded-lg hover:bg-warm-stone-50 flex-shrink-0'
+              title='Edit profile'
+            >
+              <PenSquare className='w-4 h-4' />
+            </button>
+          )}
         </div>
 
-        {/* User Details */}
-        {/* <div className='space-y-3 mb-4'>
-          <div className='flex items-center gap-3'>
-            <Mail className='w-4 h-4 text-gray-400' />
-            <div className='flex-1'>
-              {isEditing ? (
-                <input
-                  type='email'
-                  value={editedUser.email}
-                  onChange={(e) =>
-                    setEditedUser({ ...editedUser, email: e.target.value })
-                  }
-                  className='w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500'
-                  placeholder='Email address'
-                />
-              ) : (
-                <span className='text-sm text-gray-700'>{user?.email}</span>
-              )}
-            </div>
+        {/* Email — read only */}
+        {user?.email && (
+          <div className='flex items-center gap-2.5 text-warm-stone-500'>
+            <Mail className='w-3.5 h-3.5 flex-shrink-0' />
+            <span className='font-body text-xs truncate'>{user.email}</span>
           </div>
-        </div> */}
+        )}
 
-        {/* Success Message */}
+        {/* Wishlist stats */}
+        <div className='flex items-center gap-2.5 py-2.5 px-3 bg-warm-stone-50 rounded-xl'>
+          <ShoppingBag className='w-3.5 h-3.5 text-brand-500 flex-shrink-0' />
+          <span className='font-mono text-xs text-warm-stone-600'>
+            {itemCount} {itemCount === 1 ? 'item' : 'items'}
+            {totalValue > 0 && (
+              <> · <span className='text-espresso'>{formatCurrency(totalValue)}</span> tracked</>
+            )}
+          </span>
+        </div>
+
+        {/* Feedback messages */}
         {saveSuccess && (
-          <div className='mb-4 p-3 bg-green-50 border border-green-200 rounded-lg'>
-            <p className='text-sm text-green-700'>
-              ✅ Profile updated successfully! Changes are now visible.
+          <div className='p-3 bg-green-50 border border-green-200 rounded-xl'>
+            <p className='font-body text-xs text-green-700'>
+              ✓ Profile updated successfully.
             </p>
           </div>
         )}
-
-        {/* Error Message */}
         {saveError && (
-          <div className='mb-4 p-3 bg-red-50 border border-red-200 rounded-lg'>
-            <p className='text-sm text-red-700'>{saveError}</p>
+          <div className='p-3 bg-red-50 border border-red-200 rounded-xl'>
+            <p className='font-body text-xs text-red-700'>{saveError}</p>
           </div>
         )}
 
-        {/* Actions */}
-        <div className='space-y-2'>
-          <div className='flex gap-2'>
-            {isEditing ? (
-              <>
-                <button
-                  onClick={handleSave}
-                  disabled={isSaving}
-                  className='flex-1 btn btn-primary flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed'
-                >
-                  <Save className='w-4 h-4' />
-                  {isSaving ? 'Saving...' : 'Save'}
-                </button>
-                <button
-                  onClick={handleCancel}
-                  disabled={isSaving}
-                  className='flex-1 btn btn-secondary flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed'
-                >
-                  <X className='w-4 h-4' />
-                  Cancel
-                </button>
-              </>
-            ) : (
+        {/* Action buttons */}
+        <div className='space-y-2 pt-1'>
+          {isEditing ? (
+            <div className='flex gap-2'>
               <button
-                onClick={() => setIsEditing(true)}
-                className='flex-1 btn btn-secondary flex items-center justify-center gap-2'
+                onClick={() => handleSave(onClose)}
+                disabled={isSaving}
+                className='flex-1 btn btn-primary flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed'
               >
-                <Edit3 className='w-4 h-4' />
-                Edit Profile
+                <Save className='w-3.5 h-3.5' />
+                {isSaving ? 'Saving…' : 'Save'}
               </button>
-            )}
-          </div>
-
-          {/* Logout Button */}
-          <button
-            onClick={handleLogout}
-            className='w-full btn btn-outline-danger flex items-center justify-center gap-2 text-red-600 border-red-200 bg-red-100 hover:border-red-300'
-          >
-            <LogOut className='w-4 h-4' />
-            Logout
-          </button>
+              <button
+                onClick={handleCancel}
+                disabled={isSaving}
+                className='flex-1 btn btn-secondary flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed'
+              >
+                <X className='w-3.5 h-3.5' />
+                Cancel
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={handleLogout}
+              className='btn btn-danger w-full flex items-center justify-center gap-2'
+            >
+              <LogOut className='w-3.5 h-3.5' />
+              Sign out
+            </button>
+          )}
         </div>
       </div>
     </div>

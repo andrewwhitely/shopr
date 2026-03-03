@@ -1,11 +1,11 @@
 import { Auth0Provider } from '@auth0/auth0-react';
-import React from 'react';
+import React, { FC } from 'react';
 
 interface AuthProviderProps {
   children: React.ReactNode;
 }
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
   const domain = (import.meta as any).env?.VITE_AUTH0_DOMAIN;
   const clientId = (import.meta as any).env?.VITE_AUTH0_CLIENT_ID;
   const audience = (import.meta as any).env?.VITE_AUTH0_AUDIENCE;

@@ -2,9 +2,12 @@ import { authenticateRequest } from './auth.js';
 import { WishlistDB } from './database.js';
 
 // Auth0 Management API functions
+// Requires a Machine-to-Machine (M2M) app authorized for the Management API.
+// Use AUTH0_MGMT_CLIENT_ID + AUTH0_MGMT_CLIENT_SECRET, or fall back to AUTH0_CLIENT_ID + AUTH0_CLIENT_SECRET.
 async function getManagementToken(env) {
-  // Management API MUST use tenant domain, not custom domain
   const tenantDomain = env.AUTH0_TENANT_DOMAIN || env.AUTH0_DOMAIN;
+  const clientId = env.AUTH0_MGMT_CLIENT_ID || env.AUTH0_CLIENT_ID;
+  const clientSecret = env.AUTH0_MGMT_CLIENT_SECRET || env.AUTH0_CLIENT_SECRET;
 
   const response = await fetch(`https://${tenantDomain}/oauth/token`, {
     method: 'POST',
@@ -12,8 +15,8 @@ async function getManagementToken(env) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      client_id: env.AUTH0_CLIENT_ID,
-      client_secret: env.AUTH0_CLIENT_SECRET,
+      client_id: clientId,
+      client_secret: clientSecret,
       audience: `https://${tenantDomain}/api/v2/`,
       grant_type: 'client_credentials',
     }),
@@ -22,7 +25,7 @@ async function getManagementToken(env) {
   if (!response.ok) {
     const errorText = await response.text();
     throw new Error(
-      `Failed to get management token: ${response.status} ${errorText}`
+      `Failed to get management token: ${response.status} ${errorText}`,
     );
   }
 
@@ -44,13 +47,13 @@ async function updateUserProfile(userId, updates, env) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(updates),
-    }
+    },
   );
 
   if (!response.ok) {
     const errorText = await response.text();
     throw new Error(
-      `Failed to update user profile: ${response.status} ${errorText}`
+      `Failed to update user profile: ${response.status} ${errorText}`,
     );
   }
 
@@ -71,7 +74,7 @@ async function getUserProfile(userId, env) {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-    }
+    },
   );
 
   if (!response.ok) {
@@ -115,6 +118,40 @@ function successResponse(data, status = 200) {
   });
 }
 
+// Safe JSON parsing
+async function parseJSON(request) {
+  try {
+    return await request.json();
+  } catch {
+    return null;
+  }
+}
+
+// Input validation helpers
+function isValidPrice(value) {
+  return typeof value === 'number' && isFinite(value) && value >= 0;
+}
+
+function validateNewItem(item) {
+  if (!item || typeof item !== 'object')
+    return 'Request body must be a JSON object';
+  if (!item.name || typeof item.name !== 'string' || !item.name.trim())
+    return 'name is required';
+  if (item.price === undefined || item.price === null)
+    return 'price is required';
+  if (!isValidPrice(item.price)) return 'price must be a non-negative number';
+  return null;
+}
+
+function validatePriceUpdate(body) {
+  if (!body || typeof body !== 'object')
+    return 'Request body must be a JSON object';
+  if (body.price === undefined || body.price === null)
+    return 'price is required';
+  if (!isValidPrice(body.price)) return 'price must be a non-negative number';
+  return null;
+}
+
 export default {
   async fetch(request, env, ctx) {
     // Handle CORS
@@ -152,7 +189,7 @@ export default {
         } catch (error) {
           return errorResponse(
             `Auth0 Management API error: ${error.message}`,
-            500
+            500,
           );
         }
       }
@@ -173,7 +210,9 @@ export default {
 
       if (path === '/api/wishlist' && request.method === 'POST') {
         // Add new wishlist item
-        const item = await request.json();
+        const item = await parseJSON(request);
+        const validationError = validateNewItem(item);
+        if (validationError) return errorResponse(validationError, 422);
         const newItem = await db.addWishlistItem(auth.userId, item);
         return successResponse({ item: newItem }, 201);
       }
@@ -193,11 +232,15 @@ export default {
       if (path.startsWith('/api/wishlist/') && request.method === 'PUT') {
         // Update wishlist item
         const itemId = path.split('/')[3];
-        const updates = await request.json();
+        const updates = await parseJSON(request);
+        if (!updates || typeof updates !== 'object')
+          return errorResponse('Request body must be a JSON object', 422);
+        if (updates.price !== undefined && !isValidPrice(updates.price))
+          return errorResponse('price must be a non-negative number', 422);
         const updatedItem = await db.updateWishlistItem(
           itemId,
           auth.userId,
-          updates
+          updates,
         );
 
         if (!updatedItem) {
@@ -230,7 +273,11 @@ export default {
       ) {
         // Add price entry
         const itemId = path.split('/')[3];
-        const { price } = await request.json();
+        const body = await parseJSON(request);
+        const priceValidationError = validatePriceUpdate(body);
+        if (priceValidationError)
+          return errorResponse(priceValidationError, 422);
+        const { price } = body;
 
         // Verify item exists and belongs to user
         const item = await db.getWishlistItem(itemId, auth.userId);
@@ -255,19 +302,21 @@ export default {
       if (path === '/api/user/profile' && request.method === 'PUT') {
         try {
           // Update user profile via Auth0 Management API
-          const updates = await request.json();
+          const updates = await parseJSON(request);
+          if (!updates || typeof updates !== 'object')
+            return errorResponse('Request body must be a JSON object', 422);
 
           const updatedProfile = await updateUserProfile(
             auth.userId,
             updates,
-            env
+            env,
           );
 
           return successResponse({ profile: updatedProfile });
         } catch (error) {
           return errorResponse(
             `Failed to update profile: ${error.message}`,
-            500
+            500,
           );
         }
       }
@@ -285,13 +334,11 @@ export default {
       // Route not found
       return errorResponse('Not found', 404);
     } catch (error) {
-      console.error('API Error:', error);
-
       if (error.message === 'Authentication failed') {
         return errorResponse('Unauthorized', 401);
       }
 
-      // Return more detailed error information for debugging
+      console.error('API Error:', error);
       return errorResponse(`Internal server error: ${error.message}`, 500);
     }
   },

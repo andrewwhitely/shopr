@@ -9,29 +9,24 @@ binding = "DB"
 database_name = "shopr-db"
 database_id = "2517422e-ee3f-41ef-923c-9cad7987a611"
 
-# Environment variables - Set these as secrets in production
-# wrangler secret put AUTH0_DOMAIN
-# wrangler secret put AUTH0_AUDIENCE  
-# wrangler secret put AUTH0_CLIENT_ID
-# wrangler secret put AUTH0_CLIENT_SECRET
+# Secrets — set via: wrangler secret put <NAME>
+# For Management API (profile update): wrangler secret put AUTH0_MGMT_CLIENT_SECRET
+# (Or AUTH0_CLIENT_SECRET if using same M2M app for JWT validation)
 
 [vars]
 AUTH0_DOMAIN = "auth.lunchbox.studio"
-AUTH0_TENANT_DOMAIN = "dev-o2g1z2gmea57iivc.us.auth0.com"  # Replace with your actual Auth0 tenant domain
+AUTH0_TENANT_DOMAIN = "dev-o2g1z2gmea57iivc.us.auth0.com"
 AUTH0_AUDIENCE = "https://api.shopr.app"
 AUTH0_CLIENT_ID = "oym0fIdj7otuqB6kOBK2oglKTTKnqIGg"
-AUTH0_CLIENT_SECRET = "lzo61cjnDYUBcosUXgcpUlYIRsRzpiTDXwPXle9iqSRqJDukeyZnI56fFHLSMMBp"
 
 [env.production.vars]
 AUTH0_DOMAIN = "auth.lunchbox.studio"
-AUTH0_TENANT_DOMAIN = "dev-o2g1z2gmea57iivc.us.auth0.com"  # Replace with your actual Auth0 tenant domain
+AUTH0_TENANT_DOMAIN = "dev-o2g1z2gmea57iivc.us.auth0.com"
 AUTH0_AUDIENCE = "https://api.shopr.app"
 AUTH0_CLIENT_ID = "oym0fIdj7otuqB6kOBK2oglKTTKnqIGg"
-AUTH0_CLIENT_SECRET = "lzo61cjnDYUBcosUXgcpUlYIRsRzpiTDXwPXle9iqSRqJDukeyZnI56fFHLSMMBp"
 
 [env.development.vars]
 AUTH0_DOMAIN = "auth.lunchbox.studio"
-AUTH0_TENANT_DOMAIN = "dev-o2g1z2gmea57iivc.us.auth0.com"  # Replace with your actual Auth0 tenant domain
+AUTH0_TENANT_DOMAIN = "dev-o2g1z2gmea57iivc.us.auth0.com"
 AUTH0_AUDIENCE = "https://api.shopr.app"
 AUTH0_CLIENT_ID = "oym0fIdj7otuqB6kOBK2oglKTTKnqIGg"
-AUTH0_CLIENT_SECRET = "lzo61cjnDYUBcosUXgcpUlYIRsRzpiTDXwPXle9iqSRqJDukeyZnI56fFHLSMMBp"

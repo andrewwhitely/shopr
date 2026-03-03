@@ -1,5 +1,5 @@
 import { ChevronDown, Plus, X } from 'lucide-react';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { FC, useEffect, useRef, useState } from 'react';
 
 interface CategoryDropdownProps {
   value: string;
@@ -9,7 +9,7 @@ interface CategoryDropdownProps {
   className?: string;
 }
 
-export const CategoryDropdown: React.FC<CategoryDropdownProps> = ({
+export const CategoryDropdown: FC<CategoryDropdownProps> = ({
   value,
   onChange,
   options,

@@ -1,4 +1,4 @@
-import { Plus, Search } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { AddItemModal } from './components/AddItemModal';
 import { CollapsibleFilterBar } from './components/CollapsibleFilterBar';
@@ -8,6 +8,7 @@ import { LoginButton } from './components/LoginButton';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import { StatsCard } from './components/StatsCard';
 import { WishlistItem } from './components/WishlistItem';
+import { WishlistContext } from './contexts/WishlistContext';
 import { useWishlist } from './hooks/useWishlist';
 import { NewWishlistItem, WishlistItem as WishlistItemType } from './types';
 
@@ -63,27 +64,26 @@ function App() {
     ),
   ];
 
+  const totalValue = items.reduce((sum, item) => sum + (item.price ?? 0), 0);
+
   return (
-    <div className='min-h-screen bg-gray-50'>
+    <WishlistContext.Provider value={{ itemCount: items.length, totalValue }}>
+    <div className='min-h-screen bg-parchment'>
       {/* Header */}
-      <header className='bg-white shadow-sm border-b border-gray-200 safe-area-top'>
+      <header className='bg-white/95 backdrop-blur-sm border-b border-warm-stone-100 safe-area-top sticky top-0 z-30'>
         <div className='mobile-container sm:desktop-container'>
-          <div className='flex items-center justify-between'>
-            <div>
-              <h1 className='logo-font text-5xl'>
-                <a href='/'>shopr</a>
-              </h1>
-            </div>
+          <div className='flex items-center justify-between h-14'>
+            <h1 className='logo-font text-4xl sm:text-5xl leading-none'>
+              <a href='/'>shopr</a>
+            </h1>
+
             <div className='flex items-center gap-2'>
               <ProtectedRoute
                 fallback={
                   <div className='flex items-center gap-2'>
-                    {/* Desktop Login Button for unauthenticated users */}
                     <div className='hidden sm:block'>
                       <LoginButton />
                     </div>
-
-                    {/* Mobile Hamburger Menu for unauthenticated users */}
                     <div className='sm:hidden'>
                       <HamburgerMenu />
                     </div>
@@ -97,16 +97,14 @@ function App() {
                     className='btn btn-primary items-center gap-2 hidden sm:flex'
                     title='Add new item'
                   >
-                    <Plus className='w-5 h-5' />
+                    <Plus className='w-4 h-4' />
                     <span>Add Item</span>
                   </button>
 
-                  {/* Desktop Login */}
                   <div className='hidden sm:block'>
                     <LoginButton />
                   </div>
 
-                  {/* Mobile Hamburger Menu for authenticated users */}
                   <div className='sm:hidden'>
                     <HamburgerMenu />
                   </div>
@@ -123,10 +121,10 @@ function App() {
           <div className='sm:desktop-grid'>
             {/* Desktop Sidebar */}
             <aside className='sm:desktop-sidebar hidden sm:block'>
-              {/* Stats */}
               <StatsCard items={items} />
 
-              {/* Filters */}
+              <div className='h-px bg-warm-stone-200' />
+
               <FilterBar
                 filters={filters}
                 onFiltersChange={setFilters}
@@ -135,7 +133,7 @@ function App() {
             </aside>
 
             {/* Mobile Stats & Filters */}
-            <div className='sm:hidden space-y-6 mb-6'>
+            <div className='sm:hidden space-y-4 mb-5'>
               <StatsCard items={items} />
               <CollapsibleFilterBar
                 filters={filters}
@@ -146,70 +144,39 @@ function App() {
 
             {/* Main Content Area */}
             <div className='sm:desktop-main'>
-              {/* Desktop Stats (compact) */}
-              <div className='hidden sm:block mb-6'>
-                <div className='grid grid-cols-4 gap-4'>
-                  <div className='card text-center'>
-                    <div className='text-2xl font-bold text-gray-900'>
-                      {items.length}
-                    </div>
-                    <div className='text-sm text-gray-600'>Total Items</div>
-                  </div>
-                  <div className='card text-center'>
-                    <div className='text-2xl font-bold text-green-600'>
-                      {items.filter((item) => item.purchased).length}
-                    </div>
-                    <div className='text-sm text-gray-600'>Purchased</div>
-                  </div>
-                  <div className='card text-center'>
-                    <div className='text-2xl font-bold text-blue-600'>
-                      {items.filter((item) => !item.purchased).length}
-                    </div>
-                    <div className='text-sm text-gray-600'>Remaining</div>
-                  </div>
-                  <div className='card text-center'>
-                    <div className='text-2xl font-bold text-purple-600'>
-                      {
-                        new Set(
-                          items.map((item) => item.category).filter(Boolean)
-                        ).size
-                      }
-                    </div>
-                    <div className='text-sm text-gray-600'>Categories</div>
-                  </div>
-                </div>
-              </div>
-
               {loading ? (
-                <div className='card text-center py-12'>
-                  <div className='animate-spin w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4'></div>
-                  <p className='text-gray-600'>Loading your wishlist...</p>
+                <div className='text-center py-16'>
+                  <div className='spinner mx-auto mb-4' />
+                  <p className='text-sm font-body text-warm-stone-500'>
+                    Loading your wishlist…
+                  </p>
                 </div>
               ) : error ? (
-                <div className='card text-center py-12'>
-                  <div className='text-red-500 mb-4'>
-                    <Search className='w-12 h-12 mx-auto mb-2' />
-                    <h3 className='text-lg font-medium mb-2'>
-                      Error loading wishlist
-                    </h3>
-                    <p className='text-sm text-gray-600 mb-4'>{error}</p>
-                    <button onClick={refreshItems} className='btn btn-primary'>
-                      Try Again
-                    </button>
-                  </div>
+                <div className='text-center py-16'>
+                  <p className='font-display text-2xl font-light text-espresso mb-2'>
+                    Something went wrong
+                  </p>
+                  <p className='text-sm font-body text-warm-stone-500 mb-6'>
+                    {error}
+                  </p>
+                  <button onClick={refreshItems} className='btn btn-primary'>
+                    Try Again
+                  </button>
                 </div>
               ) : filteredItems.length === 0 ? (
-                <div className='card text-center py-12'>
-                  <Search className='w-12 h-12 text-gray-400 mx-auto mb-4' />
-                  <h3 className='text-lg font-medium text-gray-900 mb-2'>
+                <div className='text-center py-16'>
+                  <div className='font-display text-7xl font-light text-warm-stone-200 mb-4 leading-none select-none'>
+                    ∅
+                  </div>
+                  <h3 className='font-display text-2xl font-light text-espresso mb-2'>
                     {items.length === 0
-                      ? 'No items yet'
-                      : 'No items match your filters'}
+                      ? 'Your wishlist awaits'
+                      : 'No matches found'}
                   </h3>
-                  <p className='text-gray-600 mb-4'>
+                  <p className='text-sm font-body text-warm-stone-500 mb-6'>
                     {items.length === 0
-                      ? 'Start building your wishlist by adding your first item!'
-                      : 'Try adjusting your filters to see more items.'}
+                      ? 'Start tracking the things you want.'
+                      : 'Try adjusting your filters.'}
                   </p>
                   {items.length === 0 && (
                     <button
@@ -222,17 +189,19 @@ function App() {
                 </div>
               ) : (
                 <div className='space-y-4'>
-                  {/* Mobile Add Item Button */}
+                  {/* Mobile Add Button */}
                   <div className='sm:hidden'>
                     <button
                       onClick={() => setIsAddModalOpen(true)}
                       className='btn btn-primary w-full'
                     >
+                      <Plus className='w-4 h-4 mr-2' />
                       Add New Item
                     </button>
                   </div>
 
-                  <div className='max-h-[60vh] overflow-y-auto pr-1 space-y-4'>
+                  {/* Items List */}
+                  <div className='bg-white rounded-xl border border-warm-stone-200 overflow-hidden divide-y divide-warm-stone-100'>
                     {filteredItems.map((item) => (
                       <WishlistItem
                         key={item.id}
@@ -244,6 +213,11 @@ function App() {
                       />
                     ))}
                   </div>
+
+                  <p className='text-xs font-body text-warm-stone-400 text-center pt-1'>
+                    {filteredItems.length} item
+                    {filteredItems.length !== 1 ? 's' : ''}
+                  </p>
                 </div>
               )}
             </div>
@@ -260,6 +234,7 @@ function App() {
         categories={categories}
       />
     </div>
+    </WishlistContext.Provider>
   );
 }
 

@@ -125,8 +125,6 @@ All data is stored locally in your browser using localStorage. This means:
 - ✅ No server required
 - ✅ Data stays private on your device
 - ✅ Works offline
-- ⚠️ Data is tied to your browser/device
-- ⚠️ Clearing browser data will remove your wishlist
 
 ## Browser Support
 

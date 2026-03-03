@@ -1,5 +1,19 @@
 // Database helper functions for D1
 
+// Explicit whitelist of columns that may be updated via the API.
+// Any key not in this set is silently ignored, preventing SQL injection
+// through dynamic column names in updateWishlistItem().
+const UPDATABLE_COLUMNS = new Set([
+  'name',
+  'price',
+  'currency',
+  'purchased',
+  'date_purchased',
+  'notes',
+  'category',
+  'url',
+]);
+
 export class WishlistDB {
   constructor(db) {
     this.db = db;
@@ -100,12 +114,13 @@ export class WishlistDB {
     const values = [];
 
     Object.entries(updates).forEach(([key, value]) => {
+      if (!UPDATABLE_COLUMNS.has(key)) return;
       if (key === 'purchased') {
         setParts.push(`${key} = ?`);
         values.push(value ? 1 : 0);
-      } else if (key !== 'id' && key !== 'user_id') {
+      } else {
         setParts.push(`${key} = ?`);
-        values.push(value);
+        values.push(value ?? null);
       }
     });
 

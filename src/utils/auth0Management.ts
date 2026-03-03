@@ -18,13 +18,17 @@ export const useAuth0Management = () => {
   const API_BASE_URL =
     (import.meta as any).env?.VITE_API_BASE_URL ||
     'https://shopr-api.andrewnwhitely.workers.dev';
+  const audience =
+    (import.meta as any).env?.VITE_AUTH0_AUDIENCE || 'https://api.shopr.app';
 
   const updateProfile = async (userData: UserUpdateData) => {
     if (!user?.sub) {
       throw new Error('User not authenticated');
     }
 
-    const token = await getAccessTokenSilently();
+    const token = await getAccessTokenSilently({
+      authorizationParams: { audience },
+    });
 
     const response = await fetch(`${API_BASE_URL}/api/user/profile`, {
       method: 'PUT',
@@ -48,7 +52,9 @@ export const useAuth0Management = () => {
       throw new Error('User not authenticated');
     }
 
-    const token = await getAccessTokenSilently();
+    const token = await getAccessTokenSilently({
+      authorizationParams: { audience },
+    });
 
     const response = await fetch(`${API_BASE_URL}/api/user/profile`, {
       method: 'GET',
