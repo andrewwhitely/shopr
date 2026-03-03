@@ -98,9 +98,13 @@ export const CategoryDropdown: FC<CategoryDropdownProps> = ({
       <button
         type='button'
         onClick={handleToggle}
-        className='input w-full flex items-center justify-between text-left min-h-[42px]'
+        className='input w-full flex items-center justify-between text-left min-h-[42px] cursor-pointer'
       >
-        <span className={selected.length ? 'text-gray-900' : 'text-gray-500'}>
+        <span
+          className={
+            selected.length ? 'text-espresso' : 'text-warm-stone-400'
+          }
+        >
           {selected.length > 0
             ? selected.join(', ')
             : placeholder}
@@ -109,13 +113,13 @@ export const CategoryDropdown: FC<CategoryDropdownProps> = ({
           {selected.length > 0 && (
             <div
               onClick={handleClear}
-              className='p-1 hover:bg-gray-100 rounded cursor-pointer'
+              className='p-1 hover:bg-warm-stone-100 rounded cursor-pointer'
             >
-              <X className='w-4 h-4 text-gray-400' />
+              <X className='w-4 h-4 text-warm-stone-400' />
             </div>
           )}
           <ChevronDown
-            className={`w-4 h-4 text-gray-400 transition-transform ${
+            className={`w-4 h-4 text-warm-stone-400 transition-transform ${
               isOpen ? 'rotate-180' : ''
             }`}
           />
@@ -124,9 +128,9 @@ export const CategoryDropdown: FC<CategoryDropdownProps> = ({
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className='absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-md shadow-lg max-h-60 overflow-hidden'>
+        <div className='absolute z-50 w-full mt-1 bg-white border border-warm-stone-200 rounded-lg shadow-lg max-h-60 overflow-hidden'>
           {/* Search Input */}
-          <div className='p-2 border-b border-gray-100'>
+          <div className='p-2 border-b border-warm-stone-100'>
             <input
               ref={inputRef}
               type='text'
@@ -146,16 +150,16 @@ export const CategoryDropdown: FC<CategoryDropdownProps> = ({
                   key={option}
                   type='button'
                   onClick={() => handleOptionToggle(option)}
-                  className='w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center justify-between'
+                  className='w-full px-3 py-2 text-left text-sm text-espresso hover:bg-warm-stone-50 flex items-center justify-between transition-colors'
                 >
-                  <span>{option}</span>
+                  <span>{option.charAt(0).toUpperCase() + option.slice(1)}</span>
                   {selected.includes(option) && (
-                    <div className='w-2 h-2 bg-blue-500 rounded-full' />
+                    <div className='w-2 h-2 bg-brand-500 rounded-full shrink-0' />
                   )}
                 </button>
               ))
             ) : (
-              <div className='px-3 py-2 text-sm text-gray-500'>
+              <div className='px-3 py-2 text-sm text-warm-stone-500'>
                 No categories found
               </div>
             )}
@@ -165,7 +169,7 @@ export const CategoryDropdown: FC<CategoryDropdownProps> = ({
               <button
                 type='button'
                 onClick={handleCreateNew}
-                className='w-full px-3 py-2 text-left text-sm text-blue-600 hover:bg-blue-50 flex items-center gap-2 border-t border-gray-100'
+                className='w-full px-3 py-2 text-left text-sm text-brand-600 hover:bg-brand-50 flex items-center gap-2 border-t border-warm-stone-100 transition-colors'
               >
                 <Plus className='w-4 h-4' />
                 Create "{searchTerm.trim()}"

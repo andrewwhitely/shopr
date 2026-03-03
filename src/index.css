@@ -166,6 +166,34 @@
     border-color: #cfc0b2;
   }
 
+  /* ─── Select dropdowns ────────────────────────────────────── */
+  select.input,
+  .input-select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%239E8A7C' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1rem;
+    padding-right: 2.25rem;
+  }
+
+  select.input:hover:not(:focus),
+  .input-select:hover:not(:focus) {
+    border-color: #cfc0b2;
+  }
+
+  select.input:focus,
+  .input-select:focus {
+    border-color: var(--brand-primary);
+    box-shadow: 0 0 0 3px rgba(172, 89, 11, 0.1);
+  }
+
+  /* FilterBar selects: match sort button styling */
+  .filter-select {
+    @apply border-warm-stone-200 bg-white text-espresso;
+  }
+
   /* ─── Cards ───────────────────────────────────────────────── */
   .card {
     @apply rounded-xl p-4;
