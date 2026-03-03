@@ -38,6 +38,13 @@ async function updateUserProfile(userId, updates, env) {
   // Management API MUST use tenant domain, not custom domain
   const tenantDomain = env.AUTH0_TENANT_DOMAIN || env.AUTH0_DOMAIN;
 
+  // Auth0 uses "nickname" for username; map our "username" field
+  const auth0Updates = { ...updates };
+  if (auth0Updates.username !== undefined) {
+    auth0Updates.nickname = auth0Updates.username;
+    delete auth0Updates.username;
+  }
+
   const response = await fetch(
     `https://${tenantDomain}/api/v2/users/${userId}`,
     {
@@ -46,7 +53,7 @@ async function updateUserProfile(userId, updates, env) {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(updates),
+      body: JSON.stringify(auth0Updates),
     },
   );
 

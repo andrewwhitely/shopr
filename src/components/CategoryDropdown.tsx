@@ -2,8 +2,8 @@ import { ChevronDown, Plus, X } from 'lucide-react';
 import React, { FC, useEffect, useRef, useState } from 'react';
 
 interface CategoryDropdownProps {
-  value: string;
-  onChange: (value: string) => void;
+  value: string[];
+  onChange: (value: string[]) => void;
   options: string[];
   placeholder?: string;
   className?: string;
@@ -13,7 +13,7 @@ export const CategoryDropdown: FC<CategoryDropdownProps> = ({
   value,
   onChange,
   options,
-  placeholder = 'Select or create a category',
+  placeholder = 'Select or create categories',
   className = '',
 }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -21,6 +21,8 @@ export const CategoryDropdown: FC<CategoryDropdownProps> = ({
   const [filteredOptions, setFilteredOptions] = useState<string[]>([]);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const selected = Array.isArray(value) ? value : value ? [value] : [];
 
   // Filter options based on search term
   useEffect(() => {
@@ -64,28 +66,31 @@ export const CategoryDropdown: FC<CategoryDropdownProps> = ({
     }
   };
 
-  const handleOptionSelect = (option: string) => {
-    onChange(option);
-    setIsOpen(false);
-    setSearchTerm('');
+  const handleOptionToggle = (option: string) => {
+    if (selected.includes(option)) {
+      onChange(selected.filter((c) => c !== option));
+    } else {
+      onChange([...selected, option]);
+    }
   };
 
   const handleCreateNew = () => {
-    if (searchTerm.trim() && !options.includes(searchTerm.trim())) {
-      onChange(searchTerm.trim());
-      setIsOpen(false);
+    if (searchTerm.trim() && !selected.includes(searchTerm.trim())) {
+      onChange([...selected, searchTerm.trim()]);
       setSearchTerm('');
     }
   };
 
   const handleClear = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onChange('');
+    onChange([]);
     setSearchTerm('');
   };
 
   const canCreateNew =
-    searchTerm.trim() && !options.includes(searchTerm.trim());
+    searchTerm.trim() &&
+    !selected.includes(searchTerm.trim()) &&
+    !options.includes(searchTerm.trim());
 
   return (
     <div className={`relative ${className}`} ref={dropdownRef}>
@@ -93,13 +98,15 @@ export const CategoryDropdown: FC<CategoryDropdownProps> = ({
       <button
         type='button'
         onClick={handleToggle}
-        className='input w-full flex items-center justify-between text-left'
+        className='input w-full flex items-center justify-between text-left min-h-[42px]'
       >
-        <span className={value ? 'text-gray-900' : 'text-gray-500'}>
-          {value || placeholder}
+        <span className={selected.length ? 'text-gray-900' : 'text-gray-500'}>
+          {selected.length > 0
+            ? selected.join(', ')
+            : placeholder}
         </span>
         <div className='flex items-center gap-1'>
-          {value && (
+          {selected.length > 0 && (
             <div
               onClick={handleClear}
               className='p-1 hover:bg-gray-100 rounded cursor-pointer'
@@ -126,7 +133,7 @@ export const CategoryDropdown: FC<CategoryDropdownProps> = ({
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className='input w-full text-sm'
-              placeholder='Search categories...'
+              placeholder='Search or create categories...'
               onClick={(e) => e.stopPropagation()}
             />
           </div>
@@ -138,11 +145,11 @@ export const CategoryDropdown: FC<CategoryDropdownProps> = ({
                 <button
                   key={option}
                   type='button'
-                  onClick={() => handleOptionSelect(option)}
+                  onClick={() => handleOptionToggle(option)}
                   className='w-full px-3 py-2 text-left text-sm hover:bg-gray-50 flex items-center justify-between'
                 >
                   <span>{option}</span>
-                  {value === option && (
+                  {selected.includes(option) && (
                     <div className='w-2 h-2 bg-blue-500 rounded-full' />
                   )}
                 </button>

@@ -2,7 +2,7 @@ import { useAuth0 } from '@auth0/auth0-react';
 
 interface UserUpdateData {
   name?: string;
-  nickname?: string;
+  username?: string;
   email?: string;
   picture?: string;
   user_metadata?: Record<string, any>;
@@ -83,7 +83,7 @@ export const useAuth0Management = () => {
 export const createManagementApiEndpoint = (
   domain: string,
   clientId: string,
-  clientSecret: string
+  clientSecret: string,
 ) => {
   return {
     /**

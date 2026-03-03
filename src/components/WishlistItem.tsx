@@ -9,7 +9,11 @@ import {
 } from 'lucide-react';
 import React, { FC, useState } from 'react';
 import { WishlistItem as WishlistItemType } from '../types';
-import { formatCurrency, formatDateShort } from '../utils/helpers';
+import {
+  formatCurrency,
+  formatDateShort,
+  getCategoryColor,
+} from '../utils/helpers';
 
 interface WishlistItemProps {
   item: WishlistItemType;
@@ -70,10 +74,20 @@ export const WishlistItem: FC<WishlistItemProps> = ({
               {item.name}
             </h3>
 
-            {item.category && (
-              <span className='text-xs font-body font-semibold text-brand-500 uppercase tracking-widest shrink-0'>
-                {item.category}
-              </span>
+            {(item.categories ?? []).length > 0 && (
+              <div className='flex flex-wrap gap-1 shrink-0'>
+                {(item.categories ?? []).map((cat) => {
+                  const { bg, text } = getCategoryColor(cat);
+                  return (
+                    <span
+                      key={cat}
+                      className={`text-xs font-body font-semibold uppercase tracking-widest px-2 py-0.5 rounded-full ${bg} ${text}`}
+                    >
+                      {cat}
+                    </span>
+                  );
+                })}
+              </div>
             )}
           </div>
 

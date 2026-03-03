@@ -4,10 +4,16 @@
 
 @layer base {
   html {
-    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    font-family:
+      'DM Sans',
+      -apple-system,
+      BlinkMacSystemFont,
+      'Segoe UI',
       sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    background-color: #f5f0eb;
+    overscroll-behavior-y: none;
   }
 
   body {
@@ -16,6 +22,7 @@
     background-color: #f5f0eb;
     min-height: 100vh;
     color: #1a0e09;
+    overscroll-behavior-y: none;
   }
 
   #root {
@@ -24,8 +31,8 @@
 
   /* Logo font */
   .logo-font {
-    font-family: 'Modak', cursive;
-    font-weight: 400;
+    font-family: 'Belanosima', sans-serif;
+    font-weight: 600;
     color: #ac590b;
   }
 
@@ -181,6 +188,10 @@
     @apply max-w-6xl mx-auto px-6 py-8;
   }
 
+  .desktop-main-container {
+    @apply w-full max-w-none mx-0 px-6 py-8;
+  }
+
   .safe-area-top {
     padding-top: env(safe-area-inset-top);
   }
@@ -193,20 +204,38 @@
     display: grid;
     grid-template-columns: 256px 1fr;
     gap: 2.5rem;
+    min-height: calc(100vh - 6rem);
   }
 
   .desktop-sidebar {
     @apply space-y-6;
+    position: fixed;
+    left: 1.5rem;
+    top: calc(7rem + env(safe-area-inset-top, 0px));
+    width: 256px;
+    height: calc(
+      100vh - 6rem - env(safe-area-inset-top, 0px) -
+        env(safe-area-inset-bottom, 0px)
+    );
+    overflow-y: auto;
   }
 
   .desktop-main {
     @apply space-y-5;
+    grid-column: 2;
+    grid-row: 1;
+    overflow-y: auto;
+    max-height: calc(
+      100vh - 6rem - env(safe-area-inset-top, 0px) -
+        env(safe-area-inset-bottom, 0px)
+    );
   }
 
   /* ─── Mobile Navigation ───────────────────────────────────── */
   .mobile-nav-backdrop {
     opacity: 0;
-    transition: opacity 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    transition:
+      opacity 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94),
       backdrop-filter 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
     will-change: opacity;
     backdrop-filter: blur(0px);

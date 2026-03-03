@@ -114,6 +114,7 @@ class ApiClient {
 
   // Map API response to frontend WishlistItem format
   private mapApiItemToWishlistItem(apiItem: any): WishlistItem {
+    const categories = apiItem.categories ?? (apiItem.category ? [apiItem.category] : []);
     return {
       id: apiItem.id,
       name: apiItem.name,
@@ -123,7 +124,7 @@ class ApiClient {
       purchased: Boolean(apiItem.purchased),
       datePurchased: apiItem.date_purchased,
       notes: apiItem.notes,
-      category: apiItem.category,
+      categories: Array.isArray(categories) ? categories : [],
       url: apiItem.url,
       priceHistory: apiItem.priceHistory || [],
     };

@@ -43,7 +43,9 @@ export const filterAndSortItems = (
   }
 
   if (filters.category) {
-    filtered = filtered.filter((item) => item.category === filters.category);
+    filtered = filtered.filter((item) =>
+      (item.categories ?? []).includes(filters.category!)
+    );
   }
 
   // Apply sorting
@@ -71,9 +73,7 @@ export const filterAndSortItems = (
 
 export const getCategories = (items: WishlistItem[]): string[] => {
   const categories = new Set(
-    items
-      .map((item) => item.category)
-      .filter((cat): cat is string => typeof cat === 'string' && cat.length > 0)
+    items.flatMap((item) => item.categories ?? []).filter(Boolean)
   );
   return Array.from(categories).sort();
 };

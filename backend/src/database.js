@@ -11,8 +11,30 @@ const UPDATABLE_COLUMNS = new Set([
   'date_purchased',
   'notes',
   'category',
+  'categories',
   'url',
 ]);
+
+// Parse category column: JSON array or legacy single string
+function parseCategories(raw) {
+  if (raw == null || raw === '') return [];
+  if (typeof raw === 'string' && raw.startsWith('[')) {
+    try {
+      const arr = JSON.parse(raw);
+      return Array.isArray(arr) ? arr.filter((c) => typeof c === 'string') : [];
+    } catch {
+      return [raw];
+    }
+  }
+  return [String(raw)];
+}
+
+// Serialize categories array to DB string
+function serializeCategories(arr) {
+  if (!arr || !Array.isArray(arr)) return null;
+  const filtered = arr.filter((c) => typeof c === 'string' && c.trim());
+  return filtered.length === 0 ? null : JSON.stringify(filtered);
+}
 
 export class WishlistDB {
   constructor(db) {
@@ -39,8 +61,10 @@ export class WishlistDB {
     const items = await Promise.all(
       result.results.map(async (item) => {
         const priceHistory = await this.getPriceHistory(item.id);
+        const { category, ...rest } = item;
         return {
-          ...item,
+          ...rest,
+          categories: parseCategories(category),
           priceHistory,
         };
       })
@@ -67,8 +91,10 @@ export class WishlistDB {
     if (!item) return null;
 
     const priceHistory = await this.getPriceHistory(itemId);
+    const { category, ...rest } = item;
     return {
-      ...item,
+      ...rest,
+      categories: parseCategories(category),
       priceHistory,
     };
   }
@@ -97,7 +123,9 @@ export class WishlistDB {
         item.purchased ? 1 : 0,
         item.datePurchased || null,
         item.notes || null,
-        item.category || null,
+        serializeCategories(
+          item.categories ?? (item.category ? [item.category] : [])
+        ),
         item.url || null
       )
       .run();
@@ -118,6 +146,14 @@ export class WishlistDB {
       if (key === 'purchased') {
         setParts.push(`${key} = ?`);
         values.push(value ? 1 : 0);
+      } else if (key === 'categories') {
+        setParts.push('category = ?');
+        values.push(serializeCategories(value));
+      } else if (key === 'category') {
+        setParts.push('category = ?');
+        values.push(
+          serializeCategories(Array.isArray(value) ? value : value ? [value] : [])
+        );
       } else {
         setParts.push(`${key} = ?`);
         values.push(value ?? null);
@@ -193,21 +229,20 @@ export class WishlistDB {
     return result.results;
   }
 
-  // Get categories for a user
+  // Get categories for a user (from all items, flattened)
   async getCategories(userId) {
     const result = await this.db
       .prepare(
-        `
-        SELECT DISTINCT category 
-        FROM wishlist_items 
-        WHERE user_id = ? AND category IS NOT NULL AND category != ''
-        ORDER BY category
-      `
+        `SELECT category FROM wishlist_items WHERE user_id = ? AND category IS NOT NULL AND category != ''`
       )
       .bind(userId)
       .all();
 
-    return result.results.map((row) => row.category);
+    const all = new Set();
+    result.results.forEach((row) => {
+      parseCategories(row.category).forEach((c) => all.add(c));
+    });
+    return Array.from(all).sort();
   }
 
   // Generate unique ID

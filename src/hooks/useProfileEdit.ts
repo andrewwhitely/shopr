@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react';
-import { useUserState } from './useUserState';
+import { CURRENCIES } from '../constants/currencies';
+import type { Currency } from '../constants/currencies';
 import { useAuth0Management } from '../utils/auth0Management';
+import { useUserState } from './useUserState';
 
 interface EditableUser {
   name: string;
-  nickname: string;
+  username: string;
+  defaultCurrency: Currency;
 }
 
 export const useProfileEdit = (user: any) => {
@@ -12,9 +15,17 @@ export const useProfileEdit = (user: any) => {
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  // Auth0 uses "nickname" for username
+  const username = user?.nickname ?? user?.username ?? '';
+  const defaultCurrency =
+    (user?.user_metadata?.default_currency as Currency) || 'USD';
+
   const [editedUser, setEditedUser] = useState<EditableUser>({
     name: user?.name || '',
-    nickname: user?.nickname || '',
+    username,
+    defaultCurrency: CURRENCIES.includes(defaultCurrency as Currency)
+      ? defaultCurrency
+      : 'USD',
   });
 
   const { updateProfile } = useAuth0Management();
@@ -22,9 +33,13 @@ export const useProfileEdit = (user: any) => {
 
   // Sync when user prop changes (e.g. after refresh)
   useEffect(() => {
+    const u = user?.nickname ?? user?.username ?? '';
+    const curr =
+      (user?.user_metadata?.default_currency as Currency) || 'USD';
     setEditedUser({
       name: user?.name || '',
-      nickname: user?.nickname || '',
+      username: u,
+      defaultCurrency: CURRENCIES.includes(curr) ? curr : 'USD',
     });
   }, [user]);
 
@@ -36,12 +51,21 @@ export const useProfileEdit = (user: any) => {
 
       await updateProfile({
         name: editedUser.name,
-        nickname: editedUser.nickname,
+        username: editedUser.username,
+        user_metadata: {
+          ...user?.user_metadata,
+          default_currency: editedUser.defaultCurrency,
+        },
       });
 
       updateUser({
         name: editedUser.name,
-        nickname: editedUser.nickname,
+        username: editedUser.username,
+        nickname: editedUser.username, // Auth0 uses nickname; keep in sync
+        user_metadata: {
+          ...user?.user_metadata,
+          default_currency: editedUser.defaultCurrency,
+        },
       });
 
       await refreshUser();
@@ -55,7 +79,7 @@ export const useProfileEdit = (user: any) => {
       }, 2000);
     } catch (error) {
       setSaveError(
-        error instanceof Error ? error.message : 'Failed to update profile'
+        error instanceof Error ? error.message : 'Failed to update profile',
       );
     } finally {
       setIsSaving(false);
@@ -63,9 +87,12 @@ export const useProfileEdit = (user: any) => {
   };
 
   const handleCancel = () => {
+    const curr =
+      (user?.user_metadata?.default_currency as Currency) || 'USD';
     setEditedUser({
       name: user?.name || '',
-      nickname: user?.nickname || '',
+      username: user?.nickname ?? user?.username ?? '',
+      defaultCurrency: CURRENCIES.includes(curr) ? curr : 'USD',
     });
     setSaveError(null);
     setIsEditing(false);

@@ -8,7 +8,7 @@ export interface WishlistItem {
   datePurchased?: string; // ISO date string
   priceHistory: PriceEntry[];
   notes?: string;
-  category?: string;
+  categories?: string[];
   url?: string;
 }
 

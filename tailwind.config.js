@@ -35,7 +35,7 @@ export default {
         display: ['Cormorant Garamond', 'Georgia', 'serif'],
         body: ['DM Sans', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
         mono: ['DM Mono', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
-        logo: ['Modak', 'cursive'],
+        logo: ['Belanosima', 'sans-serif'],
       },
       keyframes: {
         'fade-up': {
